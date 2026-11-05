@@ -81,7 +81,6 @@ nav{display:flex;gap:8px;flex-wrap:wrap}
 .tpl .n{font-size:12.5px;font-weight:700}
 .tpl .a{font-family:var(--num);font-weight:700;font-size:15px;color:var(--f-accent)}
 .tpl[aria-checked="true"]{border-color:var(--f-ink);box-shadow:0 0 0 3px var(--accent)}
-.stylerow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted)}
 
 .set{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 18px}
 .f{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -115,31 +114,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .foot{text-align:center;color:var(--muted);font-size:12.5px;padding-top:20px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:var(--rp);padding:9px 18px;font-size:13px;z-index:60;max-width:90vw;text-align:center}
 
-/* ---- floating window (shared by preview, in-page card and PiP) ---- */
-.fw{width:100%;max-width:320px;color:var(--f-ink);font-family:var(--f-font,'Noto Sans TC',system-ui,sans-serif);font-size:13px;line-height:1.45}
-.fw.in-pip{max-width:none}
-.fw-bub{position:relative;background:var(--f-bg);border:2px solid var(--f-border);border-radius:var(--f-r,18px);padding:12px 14px;box-shadow:0 6px 16px rgba(0,0,0,.14)}
-.fw[data-style="sprout"] .fw-bub::after{content:"";position:absolute;left:50%;bottom:-10px;width:16px;height:16px;background:var(--f-tail);border-right:2px solid var(--f-border);border-bottom:2px solid var(--f-border);transform:translateX(-50%) rotate(45deg)}
-.fw-char{display:none;text-align:center;font-size:34px;line-height:1;margin-top:14px}
-.fw[data-style="sprout"] .fw-char{display:block;animation:hop 1.8s ease-in-out infinite}
-@keyframes hop{50%{transform:translateY(-5px)}}
-.fw-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.fw-chip{background:var(--f-chip);color:var(--f-chipink);border-radius:999px;padding:1px 9px;font-size:11.5px;font-weight:700}
-.fw-msg{color:var(--f-sub);font-size:11.5px}
-.fw-l{color:var(--f-sub);font-size:11.5px;margin-top:6px}
-.fw-amt{font-family:var(--f-num,'Fredoka',sans-serif);font-weight:700;font-size:30px;line-height:1.15;white-space:nowrap}
-.fw-sub{color:var(--f-sub);font-size:11.5px}
-.fw-sub b{color:var(--f-accent)}
-.fw-cd{margin-top:6px;font-weight:700;font-size:12.5px}
-.fw-bar{height:8px;border-radius:99px;background:var(--f-track);margin:6px 0 2px;overflow:hidden}
-.fw-bar i{display:block;height:100%;width:0;background:var(--f-accent);border-radius:99px}
-.fw-pct{text-align:right;color:var(--f-sub);font-size:10.5px}
-.fw hr{border:0;border-top:1px dashed var(--f-border);opacity:.6;margin:8px 0}
-.fw-row{display:flex;justify-content:space-between;gap:8px;font-size:12px}
-.fw-row span{color:var(--f-sub)}
-.fw-row b{font-weight:700}
-.fw-it{margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;font-size:12px}
-.fw[data-locked="1"] .fw-amt,.fw[data-locked="1"] .fw-row b{filter:blur(7px)}
 
 [data-skin="bear"]{--f-bg:#fffaf3;--f-tail:#fffaf3;--f-ink:#5a3d2b;--f-sub:#8c6d57;--f-accent:#c98a5c;--f-track:#f1e1cf;--f-border:#c98a5c;--f-chip:#f6e6d4;--f-chipink:#8a5a38}
 [data-skin="cat"]{--f-bg:#fff1f6;--f-tail:#fff1f6;--f-ink:#6b3a4e;--f-sub:#a0657f;--f-accent:#f06c9b;--f-track:#fcd9e6;--f-border:#f4a1c0;--f-chip:#fde0eb;--f-chipink:#c2457a}
@@ -147,8 +121,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 [data-skin="shiba"]{--f-bg:#fff5e4;--f-tail:#fff5e4;--f-ink:#6a4310;--f-sub:#9a722f;--f-accent:#f2a03d;--f-track:#fbe3bd;--f-border:#f5bd6d;--f-chip:#fde9c8;--f-chipink:#b0661a}
 [data-skin="bunny"]{--f-bg:linear-gradient(160deg,#4d4290,#2d2762);--f-tail:#322b6c;--f-ink:#f1edff;--f-sub:#b9b0e8;--f-accent:#b7a6ff;--f-track:#4a4290;--f-border:#8272d8;--f-chip:rgba(255,255,255,.15);--f-chipink:#e2dbff}
 [data-skin="pixel"]{--f-bg:#1b2547;--f-tail:#1b2547;--f-ink:#7dff9b;--f-sub:#6fbf86;--f-accent:#7dff9b;--f-track:#2c3a6b;--f-border:#7dff9b;--f-chip:#2c3a6b;--f-chipink:#7dff9b;--f-font:'DotGothic16','Noto Sans TC',monospace;--f-num:'DotGothic16',monospace;--f-r:0px}
-.fw[data-skin="pixel"] .fw-bub{border-width:3px;box-shadow:4px 4px 0 #0c1229}
-.fw[data-skin="pixel"] .fw-bar,.fw[data-skin="pixel"] .fw-bar i,.fw[data-skin="pixel"] .fw-chip{border-radius:0}
 
 
 @media (max-width:720px){
@@ -158,7 +130,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   .irow{grid-template-columns:52px minmax(0,1fr) 108px 36px}
 }
 @media (prefers-reduced-motion:reduce){
-  .bump,.fw[data-style="sprout"] .fw-char{animation:none}
+  .bump{animation:none}
 }
 </style>
 
@@ -188,23 +160,23 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     </section>
 
     <section class="card sec">
-      <h2>🕘 上班同放工時間</h2>
-      <p class="sub">午休唔計薪,進度條同每分鐘金額都會扣走午休時間。</p>
+      <h2>🕘 扮工同收工時間</h2>
+      <p class="sub">LUNCH唔計人工,進度條同每分鐘金額都會扣走LUNCH時間。</p>
       <div class="set">
-        <div class="f"><label for="start">上班時間</label><input id="start" type="time"></div>
-        <div class="f"><label for="end">放工時間</label><input id="end" type="time"></div>
-        <div class="f"><label for="ls">午休開始</label><input id="ls" type="time"></div>
-        <div class="f"><label for="le">午休結束</label><input id="le" type="time"></div>
-        <div class="f full"><span class="l">工作日</span><div class="days" id="days"></div></div>
+        <div class="f"><label for="start">扮工時間</label><input id="start" type="time"></div>
+        <div class="f"><label for="end">收工時間</label><input id="end" type="time"></div>
+        <div class="f"><label for="ls">LUNCH開始</label><input id="ls" type="time"></div>
+        <div class="f"><label for="le">LUNCH結束</label><input id="le" type="time"></div>
+        <div class="f full"><span class="l">扮工日</span><div class="days" id="days"></div></div>
         <label class="chk full"><input type="checkbox" id="jp"> 日本祝日當休息日(已收錄 2026–2027)</label>
         <div class="full warn" id="warn" hidden></div>
       </div>
     </section>
 
     <section class="card sec">
-      <h2>💰 發薪日</h2>
+      <h2>💰 出糧日</h2>
       <div class="set">
-        <div class="f"><label for="payday">給料日(每月幾號)</label><input id="payday" type="number" min="1" max="31" step="1" inputmode="numeric"><span class="hint">大過當月日數會當月底。</span></div>
+        <div class="f"><label for="payday">出糧日(每月幾號)</label><input id="payday" type="number" min="1" max="31" step="1" inputmode="numeric"><span class="hint">大過當月日數會當月底。</span></div>
         <label class="chk full"><input type="checkbox" id="early"> 遇週末、祝日、年末年始就提前到前一個營業日</label>
       </div>
     </section>
@@ -221,7 +193,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     </section>
 
     <section class="card sec">
-      <h2>🛍️ 今天賺的錢可以買…</h2>
+      <h2>🛍️ 今天賺到…</h2>
       <p class="sub">自己加、改、刪都得。圖示可以打一個 emoji,金額係每份價錢。</p>
       <div class="irows" id="itemEd"></div>
       <div class="row">
@@ -232,7 +204,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
     <section class="card sec">
       <h2>🎨 造型</h2>
-      <p class="sub">揀咗之後,成個介面同浮動視窗會一齊換。</p>
+      <p class="sub">揀咗之後,成個介面會一齊換。</p>
       <div class="tpls" role="radiogroup" aria-label="造型"></div>
     </section>
 
@@ -248,13 +220,12 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <div class="logo" data-logo aria-hidden="true">🧸</div>
         <div>
           <h1>今日賺幾多</h1>
-          <p id="subT">按日圓計・每一秒都入帳</p>
+          <p id="subT">按日圓計・每一秒都有錢落袋</p>
         </div>
       </div>
       <nav aria-label="功能">
-        <button class="pill primary" id="btnFloat" type="button">🪟 浮動視窗</button>
         <button class="pill" id="btnLock" type="button" aria-pressed="false">🙈 咪偷睇</button>
-        <button class="pill" id="btnSnd" type="button" aria-pressed="false">🔕 提示音</button>
+        <button class="pill" id="btnSnd" type="button" aria-pressed="false">🔕 金錢聲</button>
         <button class="pill" id="btnSet" type="button">⚙️ 設定</button>
       </nav>
     </header>
@@ -262,8 +233,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <div class="demo" id="sndNote" hidden>🔔 入袋提示音已開。瀏覽器規定要你喺頁面任何位置撳一下,聲音先會啟用。</div>
 
     <section class="card hero">
-      <div class="chiprow"><span class="chip" id="stChip">上班中</span><span class="chip msg" id="stMsg"></span></div>
-      <div class="lbl">今天已經賺了</div>
+      <div class="chiprow"><span class="chip" id="stChip">扮工中</span><span class="chip msg" id="stMsg"></span></div>
+      <div class="lbl">今日賺左</div>
       <div class="big amt" id="today" aria-live="off">¥0.00</div>
       <div class="rate" id="perSecTxt"></div>
       <div class="bar" role="progressbar" aria-label="今日進度" aria-valuemin="0" aria-valuemax="100" id="bar">
@@ -274,43 +245,38 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
     <div class="grid2">
       <section class="card stat">
-        <div class="k">距離下班</div>
+        <div class="k">距離收工</div>
         <div class="v" id="cd">--:--:--</div>
         <div class="s" id="cdSub"></div>
       </section>
       <section class="card stat">
-        <div class="k">本月已經賺了</div>
+        <div class="k">今個月已經賺左</div>
         <div class="v amt" id="month">¥0</div>
         <div class="s amt" id="monthSub"></div>
       </section>
       <section class="card stat">
-        <div class="k">薪資換算</div>
+        <div class="k">人工換算</div>
         <div class="conv">
           <div><div class="s">每分鐘</div><div class="v amt" id="perMin">¥0</div></div>
-          <div><div class="s">本月工作天</div><div class="v" id="wdays">0 天</div></div>
+          <div><div class="s">今個月WORKING DAY</div><div class="v" id="wdays">0 日</div></div>
         </div>
       </section>
       <section class="card stat pay">
-        <div class="k">💰 距離發薪日</div>
+        <div class="k">💰 距離出糧</div>
         <div class="v" id="payV">--</div>
         <div class="s" id="payS"></div>
       </section>
     </div>
 
-    <section class="card items" aria-label="今天賺的錢可以買">
-      <h2>今天賺的錢已經可以買…</h2>
+    <section class="card items" aria-label="今天賺到">
+      <h2>今天賺到…</h2>
       <div id="itemList" style="display:contents"></div>
     </section>
 
     <section class="card sec">
       <h2>🎨 造型</h2>
-      <p class="sub">揀一個鍾意嘅造型,成個介面同浮動視窗會一齊換。</p>
+      <p class="sub">揀一個鍾意嘅造型,成個介面會一齊換。</p>
       <div class="tpls" role="radiogroup" aria-label="造型"></div>
-      <div class="stylerow" id="styleRow">
-        <span>浮動視窗樣式</span>
-        <button class="pill stSprout" type="button" aria-pressed="true">🌱 小芽人+對話框</button>
-        <button class="pill stCard" type="button" aria-pressed="false">🪪 卡片</button>
-      </div>
     </section>
   </div>
   <footer class="foot">開發者:Samuel J</footer>
@@ -336,15 +302,18 @@ var CUR={
  EUR:{n:'歐元',s:'€',d:4,ps:4,step:1,sal:3200,items:[5,10,12,30,50]},
  GBP:{n:'英鎊',s:'£',d:4,ps:4,step:1,sal:2800,items:[5,9,12,25,45]},
  SGD:{n:'新加坡元',s:'S$',d:4,ps:4,step:1,sal:4000,items:[6,8,15,35,60]}};
-var ITEM_NAMES=[['🧋','珍奶'],['🍱','便當'],['🎬','戲票'],['🍲','鍋物'],['🎮','Switch 遊戲']];
+var ITEM_NAMES=[['🧋','廢水'],['🍱','飯盒'],['🎬','睇場戲'],['🍲','打邊爐'],['🎮','課金']];
 var SND={JPY:100,HKD:10,TWD:20,CNY:10,KRW:1000,USD:2,EUR:2,GBP:2,SGD:2};
 function itemsFor(code){return ITEM_NAMES.map(function(x,i){return {e:x[0],n:x[1],p:CUR[code].items[i]};});}
 var DEF_ITEMS=itemsFor('JPY');
 function C(){return CUR[cfg.cur]||CUR.JPY;}
-var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',style:'sprout',items:DEF_ITEMS};
+var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',items:DEF_ITEMS};
 function clone(o){return JSON.parse(JSON.stringify(o));}
 var cfg=load();
-function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);return c;}catch(e){return clone(DEF);}}
+function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);
+    var OLDN=['珍奶','便當','戲票','鍋物','Switch 遊戲'];
+    if(c.items.length===5&&c.items.every(function(it,i){return it&&it.n===OLDN[i];})){c.items.forEach(function(it,i){it.n=ITEM_NAMES[i][1];});}
+    return c;}catch(e){return clone(DEF);}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(cfg));}catch(e){}}
 
 /* ---------- Japanese national holidays (2026-2027) ---------- */
@@ -388,12 +357,12 @@ function calc(now){
   var today=daily*frac;
   var month=before*daily+today;
   var st,msg,chip;
-  if(!wd){chip='休假日';msg='今日放假,好好休息 🎌';st='rest';}
-  else if(s<t.a){chip='未上班';msg='先飲啖水,準備開工 ☕';st='pre';}
-  else if(s>=t.b){chip='已下班';msg='辛苦晒,收工 🎉';st='post';}
-  else if(t.ov>0&&s>=t.lo&&s<t.hi){chip='午休中';msg='食飽先,午休唔計薪 🍱';st='lunch';}
-  else{chip='上班中';st='work';
-    msg=frac<.25?'新一日開始,慢慢嚟 ☀️':frac<.5?'仲有啲時間,加油 💪':frac<.75?'過咗半場喇 🚶':'快下班了,再忍一下 🙌';}
+  if(!wd){chip='ANGLE方加';msg='今日方加,玩下HEA下 🎌';st='rest';}
+  else if(s<t.a){chip='未開工';msg='飲啖水先,拉下筋準備開工 ☕';st='pre';}
+  else if(s>=t.b){chip='扮工完畢';msg='辛苦晒,咁又1DAY 🎉';st='post';}
+  else if(t.ov>0&&s>=t.lo&&s<t.hi){chip='食緊飯';msg='食個靚飯抖一抖先啦 🍱';st='lunch';}
+  else{chip='扮工中';st='work';
+    msg=frac<.25?'又開始新一日,加油 ☀️':frac<.5?'已經過左1/4,捱住 💪':frac<.75?'過咗半場喇 🚶':'就收工,屌住 🙌';}
   var left=(wd&&s<t.b)?t.b-s:0;
   var today0=new Date(y,m,td),pd=null;
   for(var k=0;k<2&&!pd;k++){
@@ -412,45 +381,16 @@ function calc(now){
 /* ---------- formatting ---------- */
 function yen(n,dp){return C().s+n.toLocaleString('en-US',{minimumFractionDigits:dp,maximumFractionDigits:dp});}
 function digits(str){return str.replace(/[0-9]/g,function(c){return '<span class="d">'+c+'</span>';});}
-function pdText(st){var d=st.pd;return d?(d.getMonth()+1)+'月'+d.getDate()+'日(週'+WKC[d.getDay()]+')':'';}
+function pdText(st){var d=st.pd;return d?(d.getMonth()+1)+'月'+d.getDate()+'日(星期'+WKC[d.getDay()]+')':'';}
 function hm(sec){return pad(Math.floor(sec/3600))+':'+pad(Math.floor(sec%3600/60));}
 
 /* ---------- skins ---------- */
 var SKINS={
-  bear:{n:'奶茶熊',e:'🧸',bg:'#fffaf3',page:'#f2dfc8',dark:false},cat:{n:'粉紅喵',e:'🐱',bg:'#fff1f6',page:'#ffdce9',dark:false},
-  frog:{n:'薄荷蛙',e:'🐸',bg:'#ecfaf2',page:'#d3f0e1',dark:false},shiba:{n:'柴柴',e:'🐶',bg:'#fff5e4',page:'#fbe2b6',dark:false},
-  bunny:{n:'星空兔',e:'🐰',bg:'#2d2762',page:'#1c1845',dark:true},pixel:{n:'像素小怪',e:'👾',bg:'#1b2547',page:'#0c1229',dark:true}};
+  bear:{n:'啡啤啤',e:'🧸',bg:'#fffaf3',page:'#f2dfc8',dark:false},cat:{n:'粉紅貓貓',e:'🐱',bg:'#fff1f6',page:'#ffdce9',dark:false},
+  frog:{n:'薄荷蛙',e:'🐸',bg:'#ecfaf2',page:'#d3f0e1',dark:false},shiba:{n:'狗狗',e:'🐶',bg:'#fff5e4',page:'#fbe2b6',dark:false},
+  bunny:{n:'紫色兔兔',e:'🐰',bg:'#2d2762',page:'#1c1845',dark:true},pixel:{n:'8-BIT',e:'👾',bg:'#1b2547',page:'#0c1229',dark:true}};
 
-/* ---------- floating-card factory ---------- */
-var instances=new Set();
 var locked=false;
-function makeFW(){
-  var el=document.createElement('div');
-  el.className='fw';
-  el.innerHTML='<div class="fw-bub"><div class="fw-top"><span class="fw-chip"></span><span class="fw-msg"></span></div>'+
-   '<div class="fw-l">今天已經賺了</div><div class="fw-amt"></div><div class="fw-sub"></div>'+
-   '<div class="fw-cd"></div><div class="fw-bar"><i></i></div><div class="fw-pct"></div><hr>'+
-   '<div class="fw-row"><span>本月已賺</span><b class="m"></b></div><div class="fw-row"><span>發薪日</span><b class="p"></b></div>'+
-   '<div class="fw-it"></div></div><div class="fw-char"></div>';
-  var r={chip:$('.fw-chip',el),msg:$('.fw-msg',el),amt:$('.fw-amt',el),sub:$('.fw-sub',el),cd:$('.fw-cd',el),fill:$('.fw-bar i',el),pct:$('.fw-pct',el),m:$('.m',el),p:$('.p',el),it:$('.fw-it',el),ch:$('.fw-char',el)};
-  var inst={el:el,pipWin:null,
-    skin:function(){el.setAttribute('data-skin',cfg.skin);el.setAttribute('data-style',cfg.style);r.ch.textContent=SKINS[cfg.skin].e;
-      if(inst.pipWin){inst.pipWin.document.body.style.background=SKINS[cfg.skin].bg;}},
-    update:function(st){
-      el.setAttribute('data-locked',locked?'1':'0');
-      r.chip.textContent=st.chip;r.msg.textContent=st.msg;
-      var a=digits(yen(st.today,C().d));if(r.amt.dataset.v!==a){r.amt.innerHTML=a;r.amt.dataset.v=a;}
-      r.sub.innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,C().ps)+'</b> 入帳中':'暫停入帳';
-      r.cd.textContent='⏱ 下班倒數 '+(st.wd?hms(st.left):'--:--:--');
-      r.fill.style.width=(st.frac*100)+'%';r.pct.textContent='今日進度 '+(st.frac*100).toFixed(1)+'%';
-      r.m.textContent=yen(st.month,0);
-      r.p.textContent=st.pdDays===0?'今天發薪!🎉':st.pdDays+' 天後';
-      var shown=st.items.filter(function(i){return i.c>0;}).slice(0,3);
-      r.it.innerHTML=shown.length?shown.map(function(i){return '<span>'+esc(i.e)+'×'+i.c+'</span>';}).join(''):'<span style="color:var(--f-sub)">再賺多啲就買到嘢喇</span>';
-    }};
-  inst.skin();
-  return inst;
-}
 
 /* ---------- home view ---------- */
 var lastInt=-1;
@@ -464,26 +404,25 @@ function render(){
     if(ip!==lastInt&&lastInt>=0&&st.st==='work'){T.classList.remove('bump');void T.offsetWidth;T.classList.add('bump');}
     lastInt=ip;
     $('#stChip').textContent=st.chip;$('#stMsg').textContent=st.msg;
-    $('#perSecTxt').innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,C().ps)+'</b> 入帳中':'而家暫停入帳';
+    $('#perSecTxt').innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,C().ps)+'</b> 入緊袋':'冇錢袋MOMENT';
     var pc=st.frac*100;
     $('#barFill').style.width=pc+'%';$('#barMk').style.left=pc+'%';
     $('#bar').setAttribute('aria-valuenow',pc.toFixed(0));
     $('#pct').textContent=pc.toFixed(1)+'%';
     $('#tStart').textContent=hm(st.t.a);$('#tEnd').textContent=hm(st.t.b);
     $('#cd').textContent=st.wd?hms(st.left):'--:--:--';
-    $('#cdSub').textContent=st.wd?(st.left>0?hm(st.t.b)+' 下班':'今日已經下班'):'今日休假';
+    $('#cdSub').textContent=st.wd?(st.left>0?hm(st.t.b)+' 收工':'今日已經扮完工'):'今日方加';
     $('#month').textContent=yen(st.month,0);
-    $('#monthSub').textContent='本月預估 '+yen(st.salary,0)+' · 已達 '+st.monthPct.toFixed(1)+'%';
+    $('#monthSub').textContent='今個月估計賺到 '+yen(st.salary,0)+' · 已達 '+st.monthPct.toFixed(1)+'%';
     $('#perMin').textContent=yen(st.perMin,2);
-    $('#wdays').textContent=st.workdays+' 天';
-    $('#payV').textContent=st.pdDays===0?'今天發薪!🎉':'仲有 '+st.pdDays+' 天';
-    $('#payS').textContent=pdText(st)+' 發薪 · 每月 '+cfg.payday+' 號'+(cfg.early?'(遇假日提前)':'');
+    $('#wdays').textContent=st.workdays+' 日';
+    $('#payV').textContent=st.pdDays===0?'今天出糧!🎉':'仲有 '+st.pdDays+' 日';
+    $('#payS').textContent=pdText(st)+' 出糧 · 每月 '+cfg.payday+' 號'+(cfg.early?'(遇假日提前)':'');
     var L=$('#itemList'),h='';
     st.items.forEach(function(i){h+='<span class="item'+(i.c?'':' zero')+'" title="'+esc(yen(i.p,0))+' / 份"><span class="e">'+esc(i.e)+'</span>'+esc(i.n)+' <b>×'+i.c+'</b></span>';});
     if(!h)h='<span class="empty">未有項目,去「設定」加幾樣啦。</span>';
     if(L.dataset.v!==h){L.innerHTML=h;L.dataset.v=h;}
   }
-  instances.forEach(function(x){x.update(st);});
 }
 
 /* ---------- skin (whole interface) ---------- */
@@ -507,12 +446,7 @@ function applySkin(){
   drawTpls();
   $$('[data-logo]').forEach(function(n){n.textContent=S.e;});
   $('#barMk').textContent=S.e;
-  $$('.stSprout').forEach(function(b){b.setAttribute('aria-pressed',cfg.style==='sprout');});
-  $$('.stCard').forEach(function(b){b.setAttribute('aria-pressed',cfg.style==='card');});
-  instances.forEach(function(x){x.skin();});
 }
-$$('.stSprout').forEach(function(b){b.onclick=function(){cfg.style='sprout';save();applySkin();};});
-$$('.stCard').forEach(function(b){b.onclick=function(){cfg.style='card';save();applySkin();};});
 
 /* ---------- toast ---------- */
 var toastT;
@@ -520,24 +454,6 @@ function toast(msg){
   var t=$('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);}
   t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true;},3200);
 }
-
-/* ---------- floating window (Document Picture-in-Picture) ---------- */
-var pip=null;
-async function openFloat(){
-  if(pip){try{pip.win.close();}catch(e){}return;}
-  if(!('documentPictureInPicture' in window)){toast('呢個瀏覽器唔支援浮動視窗(要電腦版 Chrome / Edge)');return;}
-  try{
-    var w=await window.documentPictureInPicture.requestWindow({width:340,height:420});
-    $$('style,link[rel="stylesheet"]').forEach(function(n){w.document.head.appendChild(n.cloneNode(true));});
-    w.document.body.style.cssText='margin:0;padding:10px;display:flex;justify-content:center;align-items:flex-start;';
-    var inst=makeFW();inst.pipWin=w;inst.skin();inst.el.classList.add('in-pip');
-    w.document.body.appendChild(inst.el);instances.add(inst);pip={win:w,inst:inst};
-    $('#btnFloat').textContent='🪟 關閉浮動視窗';
-    w.addEventListener('pagehide',function(){instances.delete(inst);pip=null;$('#btnFloat').textContent='🪟 浮動視窗';});
-    render();
-  }catch(e){toast('呢個環境開唔到浮動視窗,試下喺 Chrome / Edge 直接開檔案用');}
-}
-$('#btnFloat').onclick=openFloat;
 
 /* ---------- coin sound ---------- */
 var AC=null,unlocked=false,lastMs=-1;
@@ -567,7 +483,7 @@ function checkSound(st){
   if(lastMs<0){lastMs=k;return;}
   if(k>lastMs){if(st.st==='work')coin(cfg.vol/100);lastMs=k;}else if(k<lastMs){lastMs=k;}
 }
-function syncSndBtn(){var b=$('#btnSnd');b.setAttribute('aria-pressed',cfg.snd);b.textContent=cfg.snd?'🔔 提示音':'🔕 提示音';}
+function syncSndBtn(){var b=$('#btnSnd');b.setAttribute('aria-pressed',cfg.snd);b.textContent=cfg.snd?'🔔 金錢聲':'🔕 金錢聲';}
 $('#btnSnd').onclick=function(){cfg.snd=!cfg.snd;save();lastMs=-1;syncSndBtn();if(cfg.snd){coin(cfg.vol/100);unlock();}updateSndNote();};
 
 /* ---------- lock ---------- */
@@ -576,7 +492,7 @@ $('#btnLock').onclick=function(){locked=!locked;document.body.classList.toggle('
 
 /* ---------- setup view ---------- */
 var daysBox=$('#days');
-'日月火水木金土'.split('').forEach(function(c,i){
+'日一二三四五六'.split('').forEach(function(c,i){
   var l=document.createElement('label');l.innerHTML='<input type="checkbox" value="'+i+'"> '+c;daysBox.appendChild(l);});
 function fillForm(){
   $('#cur').value=cfg.cur;$('#snd').checked=cfg.snd;$('#sndStep').value=cfg.sndStep;$('#vol').value=cfg.vol;
@@ -606,7 +522,7 @@ Object.keys(CUR).forEach(function(k){var o=document.createElement('option');o.va
 function applyCurUI(){
   var c=C();
   $('#salLbl').textContent='月薪('+c.s+')';
-  $('#subT').textContent='按'+c.n+'計・每一秒都入帳';
+  $('#subT').textContent='按'+c.n+'計・每一秒都有錢落袋';
   var base=SND[cfg.cur]||100;
   $('#sndPresets').innerHTML=[1,5,10,50].map(function(x){return '<button type="button" class="pill" data-preset="'+(base*x)+'">'+esc(yen(base*x,0))+'</button>';}).join('');
   $('#sndLbl').textContent='每賺到幾多('+c.s+')響一次';
@@ -676,7 +592,6 @@ $('#btnSet').onclick=function(){showView('setup');};
 
 /* ---------- boot ---------- */
 applySkin();applyCurUI();syncSndBtn();updateSndNote();
-if(!('documentPictureInPicture' in window)){$('#btnFloat').hidden=true;$('#styleRow').hidden=true;}
 showView(cfg.done?'home':'setup');
 setInterval(render,100);
 })();
