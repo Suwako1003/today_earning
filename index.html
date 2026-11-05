@@ -75,7 +75,6 @@ nav{display:flex;gap:8px;flex-wrap:wrap}
 
 .sec h2{margin:0 0 2px;font-size:16px}
 .sec .sub{margin:0 0 14px;color:var(--muted);font-size:12.5px}
-.tplwrap{display:grid;grid-template-columns:1fr 270px;gap:18px;align-items:start}
 .tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px}
 .tpl{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:2px solid transparent;border-radius:var(--rs);padding:12px;background:var(--f-bg);color:var(--f-ink);font-family:var(--f-font,var(--ui));box-shadow:0 0 0 1px rgba(0,0,0,.08)}
 .tpl .e{font-size:26px;line-height:1.1}
@@ -83,14 +82,11 @@ nav{display:flex;gap:8px;flex-wrap:wrap}
 .tpl .a{font-family:var(--num);font-weight:700;font-size:15px;color:var(--f-accent)}
 .tpl[aria-checked="true"]{border-color:var(--f-ink);box-shadow:0 0 0 3px var(--accent)}
 .stylerow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted)}
-.prev{background:var(--soft);border-radius:var(--rs);padding:14px 12px 10px}
-.prev h3{margin:0 0 8px;font-size:12.5px;color:var(--muted);font-weight:500}
-.prev .stage{display:flex;justify-content:center}
 
 .set{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 18px}
 .f{display:flex;flex-direction:column;gap:4px;min-width:0}
 .f label,.f .l{font-size:12.5px;color:var(--muted);font-weight:500}
-input[type=number],input[type=time],input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--rs);padding:8px 10px;width:100%;min-width:0}
+input[type=number],input[type=time],input[type=text],select{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--rs);padding:8px 10px;width:100%;min-width:0}
 .f .hint{font-size:11.5px;color:var(--muted)}
 .days{display:flex;gap:6px;flex-wrap:wrap}
 .days label{display:inline-flex;align-items:center;gap:4px;background:var(--soft);border-radius:var(--rp);padding:4px 10px;font-size:13px;color:var(--ink)}
@@ -111,6 +107,8 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
 .cta{display:flex;justify-content:center;padding-top:4px}
 
 .locked .amt{filter:blur(9px);user-select:none}
+.locked .rate b{filter:blur(6px)}
+.foot{text-align:center;color:var(--muted);font-size:12.5px;padding-top:20px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:var(--rp);padding:9px 18px;font-size:13px;z-index:60;max-width:90vw;text-align:center}
 
 /* ---- floating window (shared by preview, in-page card and PiP) ---- */
@@ -148,13 +146,9 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
 .fw[data-skin="pixel"] .fw-bub{border-width:3px;box-shadow:4px 4px 0 #0c1229}
 .fw[data-skin="pixel"] .fw-bar,.fw[data-skin="pixel"] .fw-bar i,.fw[data-skin="pixel"] .fw-chip{border-radius:0}
 
-.pipcard{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(320px,calc(100vw - 32px));z-index:50;touch-action:none}
-.pipcard .hd{display:flex;justify-content:space-between;align-items:center;padding:0 4px 4px;font-size:11px;color:var(--muted);cursor:grab;user-select:none}
-.pipcard .hd button{border:0;background:var(--card);border-radius:var(--rp);width:24px;height:24px;line-height:1;box-shadow:0 1px 0 var(--line)}
 
 @media (max-width:720px){
   .grid2{grid-template-columns:1fr}
-  .tplwrap{grid-template-columns:1fr}
   .hero{padding:18px}
   .brand .logo{font-size:36px}
   .irow{grid-template-columns:52px minmax(0,1fr) 108px 36px}
@@ -183,7 +177,8 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
       <h2>💴 人工</h2>
       <p class="sub">而家填咗示範數字,改成你自己嘅。</p>
       <div class="set">
-        <div class="f"><label for="salary">月薪(¥)</label><input id="salary" type="number" min="0" step="1000" inputmode="numeric"></div>
+        <div class="f"><label for="cur">貨幣</label><select id="cur"></select><span class="hint">轉貨幣會自動換成該貨幣嘅示範薪水同物價,你之後可以再自己改。</span></div>
+        <div class="f"><label for="salary" id="salLbl">月薪</label><input id="salary" type="number" min="0" step="1000" inputmode="numeric"></div>
         <div class="f"><label for="rate">計算基準(%)</label><input id="rate" type="number" min="1" max="100" step="1" inputmode="numeric"><span class="hint">100 = 額面(税前)。想睇手取り可以填 80–85。</span></div>
       </div>
     </section>
@@ -238,13 +233,12 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
         <div class="logo" data-logo aria-hidden="true">🧸</div>
         <div>
           <h1>今日賺幾多</h1>
-          <p>按日圓計・每一秒都入帳</p>
+          <p id="subT">按日圓計・每一秒都入帳</p>
         </div>
       </div>
       <nav aria-label="功能">
         <button class="pill primary" id="btnFloat" type="button">🪟 浮動視窗</button>
-        <button class="pill" id="btnCard" type="button" aria-pressed="false">📌 頁內小卡</button>
-        <button class="pill" id="btnLock" type="button" aria-pressed="false">🔒 上鎖</button>
+        <button class="pill" id="btnLock" type="button" aria-pressed="false">🙈 咪偷睇</button>
         <button class="pill" id="btnSet" type="button">⚙️ 設定</button>
       </nav>
     </header>
@@ -269,7 +263,7 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
       <section class="card stat">
         <div class="k">本月已經賺了</div>
         <div class="v amt" id="month">¥0</div>
-        <div class="s" id="monthSub"></div>
+        <div class="s amt" id="monthSub"></div>
       </section>
       <section class="card stat">
         <div class="k">薪資換算</div>
@@ -293,22 +287,15 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
     <section class="card sec">
       <h2>🎨 造型</h2>
       <p class="sub">揀一個鍾意嘅造型,成個介面同浮動視窗會一齊換。</p>
-      <div class="tplwrap">
-        <div>
-          <div class="tpls" role="radiogroup" aria-label="造型"></div>
-          <div class="stylerow">
-            <span>浮動視窗樣式</span>
-            <button class="pill stSprout" type="button" aria-pressed="true">🌱 小芽人+對話框</button>
-            <button class="pill stCard" type="button" aria-pressed="false">🪪 卡片</button>
-          </div>
-        </div>
-        <aside class="prev" aria-label="預覽">
-          <h3>浮動視窗預覽</h3>
-          <div class="stage" id="prevStage"></div>
-        </aside>
+      <div class="tpls" role="radiogroup" aria-label="造型"></div>
+      <div class="stylerow" id="styleRow">
+        <span>浮動視窗樣式</span>
+        <button class="pill stSprout" type="button" aria-pressed="true">🌱 小芽人+對話框</button>
+        <button class="pill stCard" type="button" aria-pressed="false">🪪 卡片</button>
       </div>
     </section>
   </div>
+  <footer class="foot">開發者:Samuel J</footer>
 </div>
 
 <script>
@@ -321,8 +308,21 @@ var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':
 
 /* ---------- settings ---------- */
 var STORE='salary-tick-jpy-v2';
-var DEF_ITEMS=[{e:'🧋',n:'珍奶',p:600},{e:'🍱',n:'便當',p:700},{e:'🎬',n:'戲票',p:2000},{e:'🍲',n:'鍋物',p:3500},{e:'🎮',n:'Switch 遊戲',p:6500}];
-var DEF={done:false,salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',style:'sprout',items:DEF_ITEMS};
+var CUR={
+ JPY:{n:'日圓',s:'¥',d:2,ps:3,step:10,sal:240000,items:[600,700,2000,3500,6500]},
+ HKD:{n:'港元',s:'HK$',d:3,ps:4,step:1,sal:25000,items:[30,50,90,250,400]},
+ TWD:{n:'新台幣',s:'NT$',d:3,ps:3,step:1,sal:45000,items:[60,100,300,500,1800]},
+ CNY:{n:'人民幣',s:'CN¥',d:3,ps:4,step:1,sal:10000,items:[15,30,50,120,400]},
+ KRW:{n:'韓圜',s:'₩',d:2,ps:3,step:100,sal:3000000,items:[5000,9000,15000,30000,60000]},
+ USD:{n:'美元',s:'US$',d:4,ps:4,step:1,sal:4000,items:[6,12,15,30,60]},
+ EUR:{n:'歐元',s:'€',d:4,ps:4,step:1,sal:3200,items:[5,10,12,30,50]},
+ GBP:{n:'英鎊',s:'£',d:4,ps:4,step:1,sal:2800,items:[5,9,12,25,45]},
+ SGD:{n:'新加坡元',s:'S$',d:4,ps:4,step:1,sal:4000,items:[6,8,15,35,60]}};
+var ITEM_NAMES=[['🧋','珍奶'],['🍱','便當'],['🎬','戲票'],['🍲','鍋物'],['🎮','Switch 遊戲']];
+function itemsFor(code){return ITEM_NAMES.map(function(x,i){return {e:x[0],n:x[1],p:CUR[code].items[i]};});}
+var DEF_ITEMS=itemsFor('JPY');
+function C(){return CUR[cfg.cur]||CUR.JPY;}
+var DEF={done:false,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',style:'sprout',items:DEF_ITEMS};
 function clone(o){return JSON.parse(JSON.stringify(o));}
 var cfg=load();
 function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);return c;}catch(e){return clone(DEF);}}
@@ -391,7 +391,7 @@ function calc(now){
 }
 
 /* ---------- formatting ---------- */
-function yen(n,dp){return '¥'+n.toLocaleString('ja-JP',{minimumFractionDigits:dp,maximumFractionDigits:dp});}
+function yen(n,dp){return C().s+n.toLocaleString('en-US',{minimumFractionDigits:dp,maximumFractionDigits:dp});}
 function digits(str){return str.replace(/[0-9]/g,function(c){return '<span class="d">'+c+'</span>';});}
 function pdText(st){var d=st.pd;return d?(d.getMonth()+1)+'月'+d.getDate()+'日(週'+WKC[d.getDay()]+')':'';}
 function hm(sec){return pad(Math.floor(sec/3600))+':'+pad(Math.floor(sec%3600/60));}
@@ -420,8 +420,8 @@ function makeFW(){
     update:function(st){
       el.setAttribute('data-locked',locked?'1':'0');
       r.chip.textContent=st.chip;r.msg.textContent=st.msg;
-      var a=digits(yen(st.today,2));if(r.amt.dataset.v!==a){r.amt.innerHTML=a;r.amt.dataset.v=a;}
-      r.sub.innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,3)+'</b> 入帳中':'暫停入帳';
+      var a=digits(yen(st.today,C().d));if(r.amt.dataset.v!==a){r.amt.innerHTML=a;r.amt.dataset.v=a;}
+      r.sub.innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,C().ps)+'</b> 入帳中':'暫停入帳';
       r.cd.textContent='⏱ 下班倒數 '+(st.wd?hms(st.left):'--:--:--');
       r.fill.style.width=(st.frac*100)+'%';r.pct.textContent='今日進度 '+(st.frac*100).toFixed(1)+'%';
       r.m.textContent=yen(st.month,0);
@@ -434,18 +434,17 @@ function makeFW(){
 }
 
 /* ---------- home view ---------- */
-var prev=makeFW();$('#prevStage').appendChild(prev.el);instances.add(prev);
 var lastInt=-1;
 function render(){
   var st=calc(new Date());
   if(!$('#viewHome').hidden){
-    var big=digits(yen(st.today,2));var T=$('#today');
+    var big=digits(yen(st.today,C().d));var T=$('#today');
     if(T.dataset.v!==big){T.innerHTML=big;T.dataset.v=big;}
     var ip=Math.floor(st.today);
     if(ip!==lastInt&&lastInt>=0&&st.st==='work'){T.classList.remove('bump');void T.offsetWidth;T.classList.add('bump');}
     lastInt=ip;
     $('#stChip').textContent=st.chip;$('#stMsg').textContent=st.msg;
-    $('#perSecTxt').innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,3)+'</b> 入帳中':'而家暫停入帳';
+    $('#perSecTxt').innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,C().ps)+'</b> 入帳中':'而家暫停入帳';
     var pc=st.frac*100;
     $('#barFill').style.width=pc+'%';$('#barMk').style.left=pc+'%';
     $('#bar').setAttribute('aria-valuenow',pc.toFixed(0));
@@ -460,7 +459,7 @@ function render(){
     $('#payV').textContent=st.pdDays===0?'今天發薪!🎉':'仲有 '+st.pdDays+' 天';
     $('#payS').textContent=pdText(st)+' 發薪 · 每月 '+cfg.payday+' 號'+(cfg.early?'(遇假日提前)':'');
     var L=$('#itemList'),h='';
-    st.items.forEach(function(i){h+='<span class="item'+(i.c?'':' zero')+'" title="¥'+i.p.toLocaleString('ja-JP')+' / 份"><span class="e">'+esc(i.e)+'</span>'+esc(i.n)+' <b>×'+i.c+'</b></span>';});
+    st.items.forEach(function(i){h+='<span class="item'+(i.c?'':' zero')+'" title="'+esc(yen(i.p,0))+' / 份"><span class="e">'+esc(i.e)+'</span>'+esc(i.n)+' <b>×'+i.c+'</b></span>';});
     if(!h)h='<span class="empty">未有項目,去「設定」加幾樣啦。</span>';
     if(L.dataset.v!==h){L.innerHTML=h;L.dataset.v=h;}
   }
@@ -474,7 +473,7 @@ function drawTpls(){
     Object.keys(SKINS).forEach(function(k){
       var b=document.createElement('button');b.type='button';b.className='tpl';b.setAttribute('data-skin',k);
       b.setAttribute('role','radio');b.setAttribute('aria-checked',cfg.skin===k?'true':'false');
-      b.innerHTML='<span class="e">'+SKINS[k].e+'</span><span class="n">'+SKINS[k].n+'</span><span class="a">¥1,234</span>';
+      b.innerHTML='<span class="e">'+SKINS[k].e+'</span><span class="n">'+SKINS[k].n+'</span><span class="a">'+esc(C().s)+'1,234</span>';
       b.onclick=function(){cfg.skin=k;save();applySkin();};
       box.appendChild(b);
     });
@@ -502,32 +501,11 @@ function toast(msg){
   t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true;},3200);
 }
 
-/* ---------- in-page card ---------- */
-var card=null;
-function openCard(){
-  if(card){closeCard();return;}
-  var inst=makeFW(),wrap=document.createElement('div');wrap.className='pipcard';
-  wrap.innerHTML='<div class="hd"><span>⠿ 拖動位置</span><button type="button" aria-label="關閉小卡">✕</button></div>';
-  wrap.appendChild(inst.el);document.body.appendChild(wrap);
-  instances.add(inst);card={wrap:wrap,inst:inst};
-  $('#btnCard').setAttribute('aria-pressed','true');
-  $('button',wrap).onclick=closeCard;
-  var hd=$('.hd',wrap),sx,sy,ox,oy,drag=false;
-  hd.addEventListener('pointerdown',function(e){if(e.target.tagName==='BUTTON')return;drag=true;var r=wrap.getBoundingClientRect();sx=e.clientX;sy=e.clientY;ox=r.left;oy=r.top;hd.setPointerCapture(e.pointerId);});
-  hd.addEventListener('pointermove',function(e){if(!drag)return;var w=wrap.offsetWidth,h=wrap.offsetHeight;
-    var x=Math.min(Math.max(0,ox+e.clientX-sx),innerWidth-w),y=Math.min(Math.max(0,oy+e.clientY-sy),innerHeight-h);
-    wrap.style.left=x+'px';wrap.style.top=y+'px';wrap.style.right='auto';wrap.style.bottom='auto';});
-  hd.addEventListener('pointerup',function(){drag=false;});
-  render();
-}
-function closeCard(){if(!card)return;instances.delete(card.inst);card.wrap.remove();card=null;$('#btnCard').setAttribute('aria-pressed','false');}
-$('#btnCard').onclick=openCard;
-
 /* ---------- floating window (Document Picture-in-Picture) ---------- */
 var pip=null;
 async function openFloat(){
   if(pip){try{pip.win.close();}catch(e){}return;}
-  if(!('documentPictureInPicture' in window)){toast('呢個瀏覽器唔支援浮動視窗(要 Chrome / Edge),已改用頁內小卡');if(!card)openCard();return;}
+  if(!('documentPictureInPicture' in window)){toast('呢個瀏覽器唔支援浮動視窗(要電腦版 Chrome / Edge)');return;}
   try{
     var w=await window.documentPictureInPicture.requestWindow({width:340,height:420});
     $$('style,link[rel="stylesheet"]').forEach(function(n){w.document.head.appendChild(n.cloneNode(true));});
@@ -537,39 +515,56 @@ async function openFloat(){
     $('#btnFloat').textContent='🪟 關閉浮動視窗';
     w.addEventListener('pagehide',function(){instances.delete(inst);pip=null;$('#btnFloat').textContent='🪟 浮動視窗';});
     render();
-  }catch(e){toast('開唔到浮動視窗,已改用頁內小卡');if(!card)openCard();}
+  }catch(e){toast('呢個環境開唔到浮動視窗,試下喺 Chrome / Edge 直接開檔案用');}
 }
 $('#btnFloat').onclick=openFloat;
 
 /* ---------- lock ---------- */
 $('#btnLock').onclick=function(){locked=!locked;document.body.classList.toggle('locked',locked);
-  this.setAttribute('aria-pressed',locked);this.textContent=locked?'🔓 解鎖':'🔒 上鎖';render();};
+  this.setAttribute('aria-pressed',locked);this.textContent=locked?'👀 顯示返':'🙈 咪偷睇';render();};
 
 /* ---------- setup view ---------- */
 var daysBox=$('#days');
 '日月火水木金土'.split('').forEach(function(c,i){
   var l=document.createElement('label');l.innerHTML='<input type="checkbox" value="'+i+'"> '+c;daysBox.appendChild(l);});
 function fillForm(){
+  $('#cur').value=cfg.cur;
   $('#salary').value=cfg.salary;$('#rate').value=cfg.rate;$('#start').value=cfg.start;$('#end').value=cfg.end;
   $('#ls').value=cfg.ls;$('#le').value=cfg.le;$('#payday').value=cfg.payday;$('#jp').checked=cfg.jp;$('#early').checked=cfg.early;
   $$('input',daysBox).forEach(function(c){c.checked=cfg.days.indexOf(+c.value)>=0;});
-  drawItems();summary();
+  drawItems();applyCurUI();summary();
 }
 function drawItems(){
   var h='';
   cfg.items.forEach(function(it,i){
     h+='<div class="irow" data-i="'+i+'"><input type="text" class="ie" data-k="e" maxlength="4" value="'+esc(it.e)+'" aria-label="圖示">'+
        '<input type="text" data-k="n" maxlength="14" value="'+esc(it.n)+'" placeholder="名稱" aria-label="名稱">'+
-       '<span class="ip">¥<input type="number" data-k="p" min="1" step="10" inputmode="numeric" value="'+esc(it.p)+'" aria-label="價錢"></span>'+
+       '<span class="ip">'+esc(C().s)+'<input type="number" data-k="p" min="1" step="'+C().step+'" inputmode="numeric" value="'+esc(it.p)+'" aria-label="價錢"></span>'+
        '<button type="button" class="x" data-del="'+i+'" aria-label="刪除這一項">✕</button></div>';
   });
   $('#itemEd').innerHTML=h||'<div class="empty">未有項目。按下面「新增一項」。</div>';
 }
 function summary(){
   var st=calc(new Date());
-  $('#sum').innerHTML='<span>日薪<b>'+yen(st.daily,0)+'</b></span><span>每分鐘<b>'+yen(st.perMin,2)+'</b></span><span>每秒<b>'+yen(st.perSec,3)+'</b></span><span>今個月工作日<b>'+st.workdays+' 日</b></span>';
+  $('#sum').innerHTML='<span>日薪<b>'+yen(st.daily,0)+'</b></span><span>每分鐘<b>'+yen(st.perMin,2)+'</b></span><span>每秒<b>'+yen(st.perSec,C().ps)+'</b></span><span>今個月工作日<b>'+st.workdays+' 日</b></span>';
+}
+var curSel=$('#cur');
+Object.keys(CUR).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=k+' · '+CUR[k].n+'('+CUR[k].s+')';curSel.appendChild(o);});
+function applyCurUI(){
+  var c=C();
+  $('#salLbl').textContent='月薪('+c.s+')';
+  $('#subT').textContent='按'+c.n+'計・每一秒都入帳';
+  drawTpls();
 }
 function readForm(){
+  var nc=$('#cur').value;
+  if(nc&&nc!==cfg.cur&&CUR[nc]){
+    var old=cfg.cur;
+    if(JSON.stringify(cfg.items)===JSON.stringify(itemsFor(old))){cfg.items=itemsFor(nc);}
+    else{toast('你自訂嘅物品價錢冇自動轉換,請自己檢查');}
+    if(+$('#salary').value===CUR[old].sal){$('#salary').value=CUR[nc].sal;}
+    cfg.cur=nc;drawItems();applyCurUI();
+  }
   var n=function(id,d,lo,hi){var v=parseFloat($(id).value);if(!isFinite(v))return d;return Math.min(hi,Math.max(lo,v));};
   cfg.salary=n('#salary',DEF.salary,0,100000000);cfg.rate=n('#rate',100,1,100);cfg.payday=Math.round(n('#payday',25,1,31));
   cfg.start=$('#start').value||DEF.start;cfg.end=$('#end').value||DEF.end;cfg.ls=$('#ls').value||DEF.ls;cfg.le=$('#le').value||DEF.le;
@@ -619,7 +614,8 @@ $('#btnBack').onclick=function(){showView('home');};
 $('#btnSet').onclick=function(){showView('setup');};
 
 /* ---------- boot ---------- */
-applySkin();
+applySkin();applyCurUI();
+if(!('documentPictureInPicture' in window)){$('#btnFloat').hidden=true;$('#styleRow').hidden=true;}
 showView(cfg.done?'home':'setup');
 setInterval(render,100);
 })();
