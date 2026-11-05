@@ -108,6 +108,10 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
 
 .locked .amt{filter:blur(9px);user-select:none}
 .locked .rate b{filter:blur(6px)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+#sndTest{align-self:flex-start}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.presets .pill{padding:4px 10px;font-size:12px}
 .foot{text-align:center;color:var(--muted);font-size:12.5px;padding-top:20px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:var(--rp);padding:9px 18px;font-size:13px;z-index:60;max-width:90vw;text-align:center}
 
@@ -206,6 +210,17 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
     </section>
 
     <section class="card sec">
+      <h2>🔔 入袋提示音</h2>
+      <p class="sub">每賺到指定金額就「叮」一聲。要喺頁面撳過一下,瀏覽器先肯出聲。</p>
+      <div class="set">
+        <label class="chk full"><input type="checkbox" id="snd"> 開啟入袋提示音</label>
+        <div class="f"><label for="sndStep" id="sndLbl">每賺到幾多響一次</label><input id="sndStep" type="number" min="1" step="1" inputmode="numeric"><div class="presets" id="sndPresets"></div><span class="hint" id="sndHint2"></span></div>
+        <div class="f"><label for="vol">音量</label><input id="vol" type="range" min="0" max="100" step="5"></div>
+        <div class="f full"><button class="pill" type="button" id="sndTest">▶ 試聽</button></div>
+      </div>
+    </section>
+
+    <section class="card sec">
       <h2>🛍️ 今天賺的錢可以買…</h2>
       <p class="sub">自己加、改、刪都得。圖示可以打一個 emoji,金額係每份價錢。</p>
       <div class="irows" id="itemEd"></div>
@@ -239,9 +254,12 @@ body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
       <nav aria-label="功能">
         <button class="pill primary" id="btnFloat" type="button">🪟 浮動視窗</button>
         <button class="pill" id="btnLock" type="button" aria-pressed="false">🙈 咪偷睇</button>
+        <button class="pill" id="btnSnd" type="button" aria-pressed="false">🔕 提示音</button>
         <button class="pill" id="btnSet" type="button">⚙️ 設定</button>
       </nav>
     </header>
+
+    <div class="demo" id="sndNote" hidden>🔔 入袋提示音已開。瀏覽器規定要你喺頁面任何位置撳一下,聲音先會啟用。</div>
 
     <section class="card hero">
       <div class="chiprow"><span class="chip" id="stChip">上班中</span><span class="chip msg" id="stMsg"></span></div>
@@ -319,10 +337,11 @@ var CUR={
  GBP:{n:'英鎊',s:'£',d:4,ps:4,step:1,sal:2800,items:[5,9,12,25,45]},
  SGD:{n:'新加坡元',s:'S$',d:4,ps:4,step:1,sal:4000,items:[6,8,15,35,60]}};
 var ITEM_NAMES=[['🧋','珍奶'],['🍱','便當'],['🎬','戲票'],['🍲','鍋物'],['🎮','Switch 遊戲']];
+var SND={JPY:100,HKD:10,TWD:20,CNY:10,KRW:1000,USD:2,EUR:2,GBP:2,SGD:2};
 function itemsFor(code){return ITEM_NAMES.map(function(x,i){return {e:x[0],n:x[1],p:CUR[code].items[i]};});}
 var DEF_ITEMS=itemsFor('JPY');
 function C(){return CUR[cfg.cur]||CUR.JPY;}
-var DEF={done:false,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',style:'sprout',items:DEF_ITEMS};
+var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',style:'sprout',items:DEF_ITEMS};
 function clone(o){return JSON.parse(JSON.stringify(o));}
 var cfg=load();
 function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);return c;}catch(e){return clone(DEF);}}
@@ -437,6 +456,7 @@ function makeFW(){
 var lastInt=-1;
 function render(){
   var st=calc(new Date());
+  if(!$('#viewHome').hidden)checkSound(st);
   if(!$('#viewHome').hidden){
     var big=digits(yen(st.today,C().d));var T=$('#today');
     if(T.dataset.v!==big){T.innerHTML=big;T.dataset.v=big;}
@@ -519,6 +539,37 @@ async function openFloat(){
 }
 $('#btnFloat').onclick=openFloat;
 
+/* ---------- coin sound ---------- */
+var AC=null,unlocked=false,lastMs=-1;
+function audioCtx(){
+  if(!AC){var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;try{AC=new A();}catch(e){return null;}}
+  if(AC.state==='suspended'){try{AC.resume();}catch(e){}}
+  return AC;
+}
+function coin(vol){
+  var c=audioCtx();if(!c||!(vol>0))return;
+  var t=c.currentTime;
+  [[988,0,0.08],[1319,0.08,0.4]].forEach(function(n){
+    var o=c.createOscillator(),g=c.createGain();
+    o.type='square';o.frequency.value=n[0];
+    g.gain.setValueAtTime(0.0001,t+n[1]);
+    g.gain.linearRampToValueAtTime(0.16*vol,t+n[1]+0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+n[1]+n[2]);
+    o.connect(g);g.connect(c.destination);o.start(t+n[1]);o.stop(t+n[1]+n[2]+0.02);
+  });
+}
+function updateSndNote(){$('#sndNote').hidden=!(cfg.snd&&!unlocked);}
+function unlock(){if(unlocked)return;if(audioCtx()){unlocked=true;}updateSndNote();}
+['pointerdown','keydown','touchend'].forEach(function(ev){document.addEventListener(ev,unlock,{passive:true});});
+function checkSound(st){
+  if(!cfg.snd||!(cfg.sndStep>0)){lastMs=-1;return;}
+  var k=Math.floor(st.today/cfg.sndStep);
+  if(lastMs<0){lastMs=k;return;}
+  if(k>lastMs){if(st.st==='work')coin(cfg.vol/100);lastMs=k;}else if(k<lastMs){lastMs=k;}
+}
+function syncSndBtn(){var b=$('#btnSnd');b.setAttribute('aria-pressed',cfg.snd);b.textContent=cfg.snd?'🔔 提示音':'🔕 提示音';}
+$('#btnSnd').onclick=function(){cfg.snd=!cfg.snd;save();lastMs=-1;syncSndBtn();if(cfg.snd){coin(cfg.vol/100);unlock();}updateSndNote();};
+
 /* ---------- lock ---------- */
 $('#btnLock').onclick=function(){locked=!locked;document.body.classList.toggle('locked',locked);
   this.setAttribute('aria-pressed',locked);this.textContent=locked?'👀 顯示返':'🙈 咪偷睇';render();};
@@ -528,7 +579,7 @@ var daysBox=$('#days');
 '日月火水木金土'.split('').forEach(function(c,i){
   var l=document.createElement('label');l.innerHTML='<input type="checkbox" value="'+i+'"> '+c;daysBox.appendChild(l);});
 function fillForm(){
-  $('#cur').value=cfg.cur;
+  $('#cur').value=cfg.cur;$('#snd').checked=cfg.snd;$('#sndStep').value=cfg.sndStep;$('#vol').value=cfg.vol;
   $('#salary').value=cfg.salary;$('#rate').value=cfg.rate;$('#start').value=cfg.start;$('#end').value=cfg.end;
   $('#ls').value=cfg.ls;$('#le').value=cfg.le;$('#payday').value=cfg.payday;$('#jp').checked=cfg.jp;$('#early').checked=cfg.early;
   $$('input',daysBox).forEach(function(c){c.checked=cfg.days.indexOf(+c.value)>=0;});
@@ -544,8 +595,10 @@ function drawItems(){
   });
   $('#itemEd').innerHTML=h||'<div class="empty">未有項目。按下面「新增一項」。</div>';
 }
+function fmtMin(m){return m<1?Math.max(1,Math.round(m*60))+' 秒':(m<10?m.toFixed(1):Math.round(m))+' 分鐘';}
 function summary(){
   var st=calc(new Date());
+  $('#sndHint2').textContent=st.perMin>0?'以而家嘅人工,大約每 '+fmtMin(cfg.sndStep/st.perMin)+' 響一次':'';
   $('#sum').innerHTML='<span>日薪<b>'+yen(st.daily,0)+'</b></span><span>每分鐘<b>'+yen(st.perMin,2)+'</b></span><span>每秒<b>'+yen(st.perSec,C().ps)+'</b></span><span>今個月工作日<b>'+st.workdays+' 日</b></span>';
 }
 var curSel=$('#cur');
@@ -554,6 +607,9 @@ function applyCurUI(){
   var c=C();
   $('#salLbl').textContent='月薪('+c.s+')';
   $('#subT').textContent='按'+c.n+'計・每一秒都入帳';
+  var base=SND[cfg.cur]||100;
+  $('#sndPresets').innerHTML=[1,5,10,50].map(function(x){return '<button type="button" class="pill" data-preset="'+(base*x)+'">'+esc(yen(base*x,0))+'</button>';}).join('');
+  $('#sndLbl').textContent='每賺到幾多('+c.s+')響一次';
   drawTpls();
 }
 function readForm(){
@@ -563,12 +619,14 @@ function readForm(){
     if(JSON.stringify(cfg.items)===JSON.stringify(itemsFor(old))){cfg.items=itemsFor(nc);}
     else{toast('你自訂嘅物品價錢冇自動轉換,請自己檢查');}
     if(+$('#salary').value===CUR[old].sal){$('#salary').value=CUR[nc].sal;}
+    if(+$('#sndStep').value===SND[old]){$('#sndStep').value=SND[nc];}
     cfg.cur=nc;drawItems();applyCurUI();
   }
   var n=function(id,d,lo,hi){var v=parseFloat($(id).value);if(!isFinite(v))return d;return Math.min(hi,Math.max(lo,v));};
   cfg.salary=n('#salary',DEF.salary,0,100000000);cfg.rate=n('#rate',100,1,100);cfg.payday=Math.round(n('#payday',25,1,31));
   cfg.start=$('#start').value||DEF.start;cfg.end=$('#end').value||DEF.end;cfg.ls=$('#ls').value||DEF.ls;cfg.le=$('#le').value||DEF.le;
   cfg.jp=$('#jp').checked;cfg.early=$('#early').checked;
+  cfg.snd=$('#snd').checked;cfg.sndStep=n('#sndStep',SND[cfg.cur]||100,0.01,1e9);cfg.vol=n('#vol',60,0,100);lastMs=-1;syncSndBtn();updateSndNote();
   cfg.days=$$('input',daysBox).filter(function(c){return c.checked;}).map(function(c){return +c.value;});
   var w=[];
   if(toSec(cfg.end)<=toSec(cfg.start))w.push('放工時間要遲過上班時間,暫時用返預設 9:00–18:00 計。');
@@ -588,8 +646,11 @@ $('#viewSetup').addEventListener('input',function(e){
 });
 $('#viewSetup').addEventListener('click',function(e){
   var d=e.target.closest&&e.target.closest('[data-del]');
-  if(d){cfg.items.splice(+d.getAttribute('data-del'),1);save();drawItems();render();}
+  if(d){cfg.items.splice(+d.getAttribute('data-del'),1);save();drawItems();render();return;}
+  var pr=e.target.closest&&e.target.closest('[data-preset]');
+  if(pr){$('#sndStep').value=pr.getAttribute('data-preset');readForm();}
 });
+$('#sndTest').onclick=function(){coin((+$('#vol').value||0)/100);unlock();};
 $('#addItem').onclick=function(){
   if(cfg.items.length>=12){toast('最多 12 項');return;}
   cfg.items.push({e:'🎁',n:'新項目',p:500});save();drawItems();render();
@@ -607,14 +668,14 @@ function showView(name){
     $('#setH').textContent=cfg.done?'設定':'先設定一下人工';
     $('#btnStart').textContent=cfg.done?'儲存並返回 ✨':'開始賺錢 ✨';
   }
-  window.scrollTo(0,0);render();
+  lastMs=-1;window.scrollTo(0,0);render();
 }
 $('#btnStart').onclick=function(){readForm();if(!cfg.days.length)return;cfg.done=true;save();showView('home');};
 $('#btnBack').onclick=function(){showView('home');};
 $('#btnSet').onclick=function(){showView('setup');};
 
 /* ---------- boot ---------- */
-applySkin();applyCurUI();
+applySkin();applyCurUI();syncSndBtn();updateSndNote();
 if(!('documentPictureInPicture' in window)){$('#btnFloat').hidden=true;$('#styleRow').hidden=true;}
 showView(cfg.done?'home':'setup');
 setInterval(render,100);
