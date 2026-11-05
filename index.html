@@ -1,0 +1,627 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><title>今日賺幾多</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: two views (setup page first, then the ticking dashboard). Each skin re-themes the whole page: palette, radii, fonts. */
+:root{
+  --bg:#f8ecdc; --bg2:#f2dfc8; --card:#fffaf3; --ink:#5a3d2b; --muted:#8c6d57;
+  --accent:#c98a5c; --accent-ink:#ffffff; --soft:#f6e6d4; --track:#f1e1cf; --line:#ecd9c3;
+  --shadow:0 3px 0 #e6cfb4, 0 10px 24px rgba(120,80,40,.10);
+  --rc:22px; --rp:999px; --rs:14px;
+  --num:'Fredoka','Noto Sans TC',sans-serif;
+  --ui:'Noto Sans TC','Hiragino Sans','Yu Gothic',system-ui,sans-serif;
+}
+body[data-skin="cat"]{--bg:#ffeef4;--bg2:#ffdce9;--card:#fff8fb;--ink:#6b3a4e;--muted:#a0657f;--accent:#e8548b;--accent-ink:#fff;--soft:#fde0eb;--track:#fcd9e6;--line:#f8c9db;--shadow:0 3px 0 #f6c1d5,0 10px 24px rgba(200,80,120,.12)}
+body[data-skin="frog"]{--bg:#e6f8ee;--bg2:#d3f0e1;--card:#f6fffa;--ink:#1f5a43;--muted:#4f8a72;--accent:#2a9468;--accent-ink:#fff;--soft:#d5f3e4;--track:#cdeedd;--line:#bfe7d3;--shadow:0 3px 0 #b5e0ca,0 10px 24px rgba(40,140,100,.12)}
+body[data-skin="shiba"]{--bg:#fff0d6;--bg2:#fbe2b6;--card:#fffaf0;--ink:#6a4310;--muted:#9a722f;--accent:#c97312;--accent-ink:#fff;--soft:#fde9c8;--track:#fbe3bd;--line:#f5d49c;--shadow:0 3px 0 #f0cb8d,0 10px 24px rgba(180,110,20,.12)}
+body[data-skin="bunny"]{--bg:#2a2460;--bg2:#1c1845;--card:#3a3380;--ink:#f1edff;--muted:#b9b0e8;--accent:#b7a6ff;--accent-ink:#231a5e;--soft:#4a4290;--track:#4a4290;--line:#5b52a8;--shadow:0 3px 0 #15123a,0 10px 24px rgba(0,0,0,.35);color-scheme:dark}
+body[data-skin="pixel"]{--bg:#121a36;--bg2:#0c1229;--card:#1b2547;--ink:#7dff9b;--muted:#6fbf86;--accent:#7dff9b;--accent-ink:#0c1229;--soft:#2c3a6b;--track:#2c3a6b;--line:#3a4a85;--shadow:4px 4px 0 #080d1f;--rc:0px;--rp:0px;--rs:0px;
+  --ui:'DotGothic16','Noto Sans TC',monospace;--num:'DotGothic16',monospace;color-scheme:dark}
+body[data-skin="pixel"] .card{border:3px solid var(--line)}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:linear-gradient(180deg,var(--bg),var(--bg2)) fixed;background-color:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.5;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:100%}
+.wrap{max-width:880px;margin:0 auto}
+.view{display:flex;flex-direction:column;gap:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand .logo{font-size:44px;line-height:1}
+.brand h1{margin:0;font-size:24px;line-height:1.2;font-weight:700;letter-spacing:.02em}
+.brand p{margin:0;color:var(--muted);font-size:12.5px}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:2px solid var(--line);background:var(--card);border-radius:var(--rp);padding:8px 14px;font-size:13.5px;font-weight:500;box-shadow:0 2px 0 var(--line);display:inline-flex;gap:6px;align-items:center}
+.pill:hover{border-color:var(--accent)}
+.pill.primary,.pill[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.pill.lg{padding:12px 28px;font-size:16px;font-weight:700}
+
+.card{background:var(--card);border-radius:var(--rc);padding:20px;box-shadow:var(--shadow);min-width:0}
+.hero{padding:22px 24px 24px}
+.chiprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--ink);border-radius:var(--rp);padding:4px 12px;font-size:12.5px;font-weight:500}
+.chip.msg{background:transparent;padding:0;color:var(--muted)}
+.lbl{color:var(--muted);font-size:13px;margin-top:12px}
+.big{font-family:var(--num);font-weight:700;font-size:clamp(40px,10.5vw,88px);line-height:1.1;letter-spacing:-.01em;margin:2px 0 4px;white-space:nowrap}
+.d{display:inline-block;width:.62em;text-align:center}
+.bump{animation:bump .35s ease}
+@keyframes bump{40%{transform:translateY(-4px) scale(1.015)}}
+.rate{font-size:13px;color:var(--muted);margin-bottom:16px}
+.rate b{color:var(--accent);font-family:var(--num);font-weight:600}
+.bar{position:relative;height:14px;border-radius:var(--rp);background:var(--track);margin:18px 0 6px}
+.bar>i{position:absolute;inset:0 auto 0 0;width:0;border-radius:var(--rp);background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 70%,#fff))}
+.bar>.mk{position:absolute;top:50%;left:0;transform:translate(-50%,-62%);font-size:28px;line-height:1;filter:drop-shadow(0 2px 0 rgba(0,0,0,.12))}
+.barlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.barlbl b{color:var(--accent);font-weight:600}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stat .k{color:var(--muted);font-size:13px}
+.stat .v{font-family:var(--num);font-weight:700;font-size:clamp(28px,6vw,42px);line-height:1.2;margin:6px 0 2px}
+.stat .s{color:var(--muted);font-size:12.5px}
+.conv{display:flex;gap:28px;flex-wrap:wrap;margin-top:12px}
+.conv .v{font-size:clamp(20px,4vw,26px);margin:2px 0 0}
+.pay .v{font-family:var(--ui);font-size:clamp(24px,5.5vw,38px)}
+
+.items{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.items h2{margin:0 8px 0 0;flex:1 0 100%;font-size:13px;font-weight:500;color:var(--muted)}
+.item{display:inline-flex;align-items:center;gap:8px;background:var(--soft);border-radius:var(--rs);padding:9px 14px;font-weight:500;font-size:14px}
+.item .e{font-size:22px;line-height:1}
+.item b{font-family:var(--num);color:var(--accent)}
+.item.zero{opacity:.5}
+.empty{color:var(--muted);font-size:13px}
+
+.sec h2{margin:0 0 2px;font-size:16px}
+.sec .sub{margin:0 0 14px;color:var(--muted);font-size:12.5px}
+.tplwrap{display:grid;grid-template-columns:1fr 270px;gap:18px;align-items:start}
+.tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px}
+.tpl{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:2px solid transparent;border-radius:var(--rs);padding:12px;background:var(--f-bg);color:var(--f-ink);font-family:var(--f-font,var(--ui));box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+.tpl .e{font-size:26px;line-height:1.1}
+.tpl .n{font-size:12.5px;font-weight:700}
+.tpl .a{font-family:var(--num);font-weight:700;font-size:15px;color:var(--f-accent)}
+.tpl[aria-checked="true"]{border-color:var(--f-ink);box-shadow:0 0 0 3px var(--accent)}
+.stylerow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.prev{background:var(--soft);border-radius:var(--rs);padding:14px 12px 10px}
+.prev h3{margin:0 0 8px;font-size:12.5px;color:var(--muted);font-weight:500}
+.prev .stage{display:flex;justify-content:center}
+
+.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 18px}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f label,.f .l{font-size:12.5px;color:var(--muted);font-weight:500}
+input[type=number],input[type=time],input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--rs);padding:8px 10px;width:100%;min-width:0}
+.f .hint{font-size:11.5px;color:var(--muted)}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days label{display:inline-flex;align-items:center;gap:4px;background:var(--soft);border-radius:var(--rp);padding:4px 10px;font-size:13px;color:var(--ink)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink)}
+.full{grid-column:1/-1}
+.warn{color:#c2452d;font-size:12.5px;font-weight:500}
+body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
+.irows{display:flex;flex-direction:column;gap:8px}
+.irow{display:grid;grid-template-columns:64px minmax(0,1fr) 128px 36px;gap:8px;align-items:center}
+.irow .ie{text-align:center;font-size:20px;padding:6px}
+.irow .ip{display:flex;align-items:center;gap:4px;color:var(--muted)}
+.irow .x{border:0;background:var(--soft);border-radius:var(--rp);width:36px;height:36px;line-height:1}
+.irow .x:hover{background:var(--accent);color:var(--accent-ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.sum{display:flex;gap:6px 22px;flex-wrap:wrap;align-items:baseline;background:var(--soft);box-shadow:none}
+.sum span{font-size:12.5px;color:var(--muted)}
+.sum b{font-family:var(--num);font-size:19px;color:var(--ink);margin-left:4px}
+.cta{display:flex;justify-content:center;padding-top:4px}
+
+.locked .amt{filter:blur(9px);user-select:none}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);border-radius:var(--rp);padding:9px 18px;font-size:13px;z-index:60;max-width:90vw;text-align:center}
+
+/* ---- floating window (shared by preview, in-page card and PiP) ---- */
+.fw{width:100%;max-width:320px;color:var(--f-ink);font-family:var(--f-font,'Noto Sans TC',system-ui,sans-serif);font-size:13px;line-height:1.45}
+.fw.in-pip{max-width:none}
+.fw-bub{position:relative;background:var(--f-bg);border:2px solid var(--f-border);border-radius:var(--f-r,18px);padding:12px 14px;box-shadow:0 6px 16px rgba(0,0,0,.14)}
+.fw[data-style="sprout"] .fw-bub::after{content:"";position:absolute;left:50%;bottom:-10px;width:16px;height:16px;background:var(--f-tail);border-right:2px solid var(--f-border);border-bottom:2px solid var(--f-border);transform:translateX(-50%) rotate(45deg)}
+.fw-char{display:none;text-align:center;font-size:34px;line-height:1;margin-top:14px}
+.fw[data-style="sprout"] .fw-char{display:block;animation:hop 1.8s ease-in-out infinite}
+@keyframes hop{50%{transform:translateY(-5px)}}
+.fw-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fw-chip{background:var(--f-chip);color:var(--f-chipink);border-radius:999px;padding:1px 9px;font-size:11.5px;font-weight:700}
+.fw-msg{color:var(--f-sub);font-size:11.5px}
+.fw-l{color:var(--f-sub);font-size:11.5px;margin-top:6px}
+.fw-amt{font-family:var(--f-num,'Fredoka',sans-serif);font-weight:700;font-size:30px;line-height:1.15;white-space:nowrap}
+.fw-sub{color:var(--f-sub);font-size:11.5px}
+.fw-sub b{color:var(--f-accent)}
+.fw-cd{margin-top:6px;font-weight:700;font-size:12.5px}
+.fw-bar{height:8px;border-radius:99px;background:var(--f-track);margin:6px 0 2px;overflow:hidden}
+.fw-bar i{display:block;height:100%;width:0;background:var(--f-accent);border-radius:99px}
+.fw-pct{text-align:right;color:var(--f-sub);font-size:10.5px}
+.fw hr{border:0;border-top:1px dashed var(--f-border);opacity:.6;margin:8px 0}
+.fw-row{display:flex;justify-content:space-between;gap:8px;font-size:12px}
+.fw-row span{color:var(--f-sub)}
+.fw-row b{font-weight:700}
+.fw-it{margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;font-size:12px}
+.fw[data-locked="1"] .fw-amt,.fw[data-locked="1"] .fw-row b{filter:blur(7px)}
+
+[data-skin="bear"]{--f-bg:#fffaf3;--f-tail:#fffaf3;--f-ink:#5a3d2b;--f-sub:#8c6d57;--f-accent:#c98a5c;--f-track:#f1e1cf;--f-border:#c98a5c;--f-chip:#f6e6d4;--f-chipink:#8a5a38}
+[data-skin="cat"]{--f-bg:#fff1f6;--f-tail:#fff1f6;--f-ink:#6b3a4e;--f-sub:#a0657f;--f-accent:#f06c9b;--f-track:#fcd9e6;--f-border:#f4a1c0;--f-chip:#fde0eb;--f-chipink:#c2457a}
+[data-skin="frog"]{--f-bg:#ecfaf2;--f-tail:#ecfaf2;--f-ink:#1f5a43;--f-sub:#4f8a72;--f-accent:#3fb27f;--f-track:#cdeedd;--f-border:#7fd1aa;--f-chip:#d5f3e4;--f-chipink:#23805a}
+[data-skin="shiba"]{--f-bg:#fff5e4;--f-tail:#fff5e4;--f-ink:#6a4310;--f-sub:#9a722f;--f-accent:#f2a03d;--f-track:#fbe3bd;--f-border:#f5bd6d;--f-chip:#fde9c8;--f-chipink:#b0661a}
+[data-skin="bunny"]{--f-bg:linear-gradient(160deg,#4d4290,#2d2762);--f-tail:#322b6c;--f-ink:#f1edff;--f-sub:#b9b0e8;--f-accent:#b7a6ff;--f-track:#4a4290;--f-border:#8272d8;--f-chip:rgba(255,255,255,.15);--f-chipink:#e2dbff}
+[data-skin="pixel"]{--f-bg:#1b2547;--f-tail:#1b2547;--f-ink:#7dff9b;--f-sub:#6fbf86;--f-accent:#7dff9b;--f-track:#2c3a6b;--f-border:#7dff9b;--f-chip:#2c3a6b;--f-chipink:#7dff9b;--f-font:'DotGothic16','Noto Sans TC',monospace;--f-num:'DotGothic16',monospace;--f-r:0px}
+.fw[data-skin="pixel"] .fw-bub{border-width:3px;box-shadow:4px 4px 0 #0c1229}
+.fw[data-skin="pixel"] .fw-bar,.fw[data-skin="pixel"] .fw-bar i,.fw[data-skin="pixel"] .fw-chip{border-radius:0}
+
+.pipcard{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(320px,calc(100vw - 32px));z-index:50;touch-action:none}
+.pipcard .hd{display:flex;justify-content:space-between;align-items:center;padding:0 4px 4px;font-size:11px;color:var(--muted);cursor:grab;user-select:none}
+.pipcard .hd button{border:0;background:var(--card);border-radius:var(--rp);width:24px;height:24px;line-height:1;box-shadow:0 1px 0 var(--line)}
+
+@media (max-width:720px){
+  .grid2{grid-template-columns:1fr}
+  .tplwrap{grid-template-columns:1fr}
+  .hero{padding:18px}
+  .brand .logo{font-size:36px}
+  .irow{grid-template-columns:52px minmax(0,1fr) 108px 36px}
+}
+@media (prefers-reduced-motion:reduce){
+  .bump,.fw[data-style="sprout"] .fw-char{animation:none}
+}
+</style>
+
+<div class="wrap" id="app">
+
+  <!-- ================= 設定頁 ================= -->
+  <div class="view" id="viewSetup" hidden>
+    <header>
+      <div class="brand">
+        <div class="logo" data-logo aria-hidden="true">🧸</div>
+        <div>
+          <h1 id="setH">先設定一下人工</h1>
+          <p>幾個基本資料,之後就可以睇住錢跳。全部只存喺你呢部機嘅瀏覽器入面。</p>
+        </div>
+      </div>
+      <nav><button class="pill" id="btnBack" type="button" hidden>← 返回</button></nav>
+    </header>
+
+    <section class="card sec">
+      <h2>💴 人工</h2>
+      <p class="sub">而家填咗示範數字,改成你自己嘅。</p>
+      <div class="set">
+        <div class="f"><label for="salary">月薪(¥)</label><input id="salary" type="number" min="0" step="1000" inputmode="numeric"></div>
+        <div class="f"><label for="rate">計算基準(%)</label><input id="rate" type="number" min="1" max="100" step="1" inputmode="numeric"><span class="hint">100 = 額面(税前)。想睇手取り可以填 80–85。</span></div>
+      </div>
+    </section>
+
+    <section class="card sec">
+      <h2>🕘 上班同放工時間</h2>
+      <p class="sub">午休唔計薪,進度條同每分鐘金額都會扣走午休時間。</p>
+      <div class="set">
+        <div class="f"><label for="start">上班時間</label><input id="start" type="time"></div>
+        <div class="f"><label for="end">放工時間</label><input id="end" type="time"></div>
+        <div class="f"><label for="ls">午休開始</label><input id="ls" type="time"></div>
+        <div class="f"><label for="le">午休結束</label><input id="le" type="time"></div>
+        <div class="f full"><span class="l">工作日</span><div class="days" id="days"></div></div>
+        <label class="chk full"><input type="checkbox" id="jp"> 日本祝日當休息日(已收錄 2026–2027)</label>
+        <div class="full warn" id="warn" hidden></div>
+      </div>
+    </section>
+
+    <section class="card sec">
+      <h2>💰 發薪日</h2>
+      <div class="set">
+        <div class="f"><label for="payday">給料日(每月幾號)</label><input id="payday" type="number" min="1" max="31" step="1" inputmode="numeric"><span class="hint">大過當月日數會當月底。</span></div>
+        <label class="chk full"><input type="checkbox" id="early"> 遇週末、祝日、年末年始就提前到前一個營業日</label>
+      </div>
+    </section>
+
+    <section class="card sec">
+      <h2>🛍️ 今天賺的錢可以買…</h2>
+      <p class="sub">自己加、改、刪都得。圖示可以打一個 emoji,金額係每份價錢。</p>
+      <div class="irows" id="itemEd"></div>
+      <div class="row">
+        <button class="pill" type="button" id="addItem">＋ 新增一項</button>
+        <button class="pill" type="button" id="resetItems">還原預設</button>
+      </div>
+    </section>
+
+    <section class="card sec">
+      <h2>🎨 造型</h2>
+      <p class="sub">揀咗之後,成個介面同浮動視窗會一齊換。</p>
+      <div class="tpls" role="radiogroup" aria-label="造型"></div>
+    </section>
+
+    <section class="card sum" id="sum" aria-live="polite"></section>
+
+    <div class="cta"><button class="pill primary lg" id="btnStart" type="button">開始賺錢 ✨</button></div>
+  </div>
+
+  <!-- ================= 主頁 ================= -->
+  <div class="view" id="viewHome" hidden>
+    <header>
+      <div class="brand">
+        <div class="logo" data-logo aria-hidden="true">🧸</div>
+        <div>
+          <h1>今日賺幾多</h1>
+          <p>按日圓計・每一秒都入帳</p>
+        </div>
+      </div>
+      <nav aria-label="功能">
+        <button class="pill primary" id="btnFloat" type="button">🪟 浮動視窗</button>
+        <button class="pill" id="btnCard" type="button" aria-pressed="false">📌 頁內小卡</button>
+        <button class="pill" id="btnLock" type="button" aria-pressed="false">🔒 上鎖</button>
+        <button class="pill" id="btnSet" type="button">⚙️ 設定</button>
+      </nav>
+    </header>
+
+    <section class="card hero">
+      <div class="chiprow"><span class="chip" id="stChip">上班中</span><span class="chip msg" id="stMsg"></span></div>
+      <div class="lbl">今天已經賺了</div>
+      <div class="big amt" id="today" aria-live="off">¥0.00</div>
+      <div class="rate" id="perSecTxt"></div>
+      <div class="bar" role="progressbar" aria-label="今日進度" aria-valuemin="0" aria-valuemax="100" id="bar">
+        <i id="barFill"></i><span class="mk" id="barMk" aria-hidden="true">🧸</span>
+      </div>
+      <div class="barlbl"><span id="tStart">09:00</span><b id="pct">0%</b><span id="tEnd">18:00</span></div>
+    </section>
+
+    <div class="grid2">
+      <section class="card stat">
+        <div class="k">距離下班</div>
+        <div class="v" id="cd">--:--:--</div>
+        <div class="s" id="cdSub"></div>
+      </section>
+      <section class="card stat">
+        <div class="k">本月已經賺了</div>
+        <div class="v amt" id="month">¥0</div>
+        <div class="s" id="monthSub"></div>
+      </section>
+      <section class="card stat">
+        <div class="k">薪資換算</div>
+        <div class="conv">
+          <div><div class="s">每分鐘</div><div class="v amt" id="perMin">¥0</div></div>
+          <div><div class="s">本月工作天</div><div class="v" id="wdays">0 天</div></div>
+        </div>
+      </section>
+      <section class="card stat pay">
+        <div class="k">💰 距離發薪日</div>
+        <div class="v" id="payV">--</div>
+        <div class="s" id="payS"></div>
+      </section>
+    </div>
+
+    <section class="card items" aria-label="今天賺的錢可以買">
+      <h2>今天賺的錢已經可以買…</h2>
+      <div id="itemList" style="display:contents"></div>
+    </section>
+
+    <section class="card sec">
+      <h2>🎨 造型</h2>
+      <p class="sub">揀一個鍾意嘅造型,成個介面同浮動視窗會一齊換。</p>
+      <div class="tplwrap">
+        <div>
+          <div class="tpls" role="radiogroup" aria-label="造型"></div>
+          <div class="stylerow">
+            <span>浮動視窗樣式</span>
+            <button class="pill stSprout" type="button" aria-pressed="true">🌱 小芽人+對話框</button>
+            <button class="pill stCard" type="button" aria-pressed="false">🪪 卡片</button>
+          </div>
+        </div>
+        <aside class="prev" aria-label="預覽">
+          <h3>浮動視窗預覽</h3>
+          <div class="stage" id="prevStage"></div>
+        </aside>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+var pad=function(n){return String(n).padStart(2,'0')};
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+
+/* ---------- settings ---------- */
+var STORE='salary-tick-jpy-v2';
+var DEF_ITEMS=[{e:'🧋',n:'珍奶',p:600},{e:'🍱',n:'便當',p:700},{e:'🎬',n:'戲票',p:2000},{e:'🍲',n:'鍋物',p:3500},{e:'🎮',n:'Switch 遊戲',p:6500}];
+var DEF={done:false,salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',style:'sprout',items:DEF_ITEMS};
+function clone(o){return JSON.parse(JSON.stringify(o));}
+var cfg=load();
+function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);return c;}catch(e){return clone(DEF);}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(cfg));}catch(e){}}
+
+/* ---------- Japanese national holidays (2026-2027) ---------- */
+var HOL=new Set(['2026-01-01','2026-01-12','2026-02-11','2026-02-23','2026-03-20','2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06','2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23','2026-10-12','2026-11-03','2026-11-23',
+ '2027-01-01','2027-01-11','2027-02-11','2027-02-23','2027-03-21','2027-03-22','2027-04-29','2027-05-03','2027-05-04','2027-05-05','2027-07-19','2027-08-11','2027-09-20','2027-09-23','2027-10-11','2027-11-03','2027-11-23']);
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function isHoliday(d){return HOL.has(ymd(d));}
+function isWorkday(d){return cfg.days.indexOf(d.getDay())>=0 && !(cfg.jp&&isHoliday(d));}
+function bankClosed(d){var w=d.getDay(),m=d.getMonth(),n=d.getDate();return w===0||w===6||isHoliday(d)||(m===11&&n===31)||(m===0&&n<=3);}
+
+/* ---------- time helpers ---------- */
+function toSec(hm){var p=String(hm||'').split(':');return (+p[0]||0)*3600+(+p[1]||0)*60;}
+function timing(){
+  var a=toSec(cfg.start),b=toSec(cfg.end),ls=toSec(cfg.ls),le=toSec(cfg.le);
+  if(b<=a){a=toSec(DEF.start);b=toSec(DEF.end);}
+  var lo=Math.max(a,ls),hi=Math.min(b,le);
+  var ov=(le>ls&&hi>lo)?hi-lo:0;
+  return {a:a,b:b,lo:lo,hi:hi,ov:ov,total:(b-a)-ov};
+}
+function workedSecs(s,t){
+  var w=Math.min(Math.max(s,t.a),t.b)-t.a;
+  if(t.ov>0){w-=Math.min(Math.max(s,t.lo),t.hi)-t.lo;}
+  return Math.max(0,w);
+}
+function hms(sec){sec=Math.max(0,Math.floor(sec));return pad(Math.floor(sec/3600))+':'+pad(Math.floor(sec%3600/60))+':'+pad(sec%60);}
+var WKC='日一二三四五六';
+
+/* ---------- core calculation ---------- */
+function calc(now){
+  var y=now.getFullYear(),m=now.getMonth(),td=now.getDate();
+  var dim=new Date(y,m+1,0).getDate(),total=0,before=0;
+  for(var d=1;d<=dim;d++){if(isWorkday(new Date(y,m,d))){total++;if(d<td)before++;}}
+  var salary=cfg.salary*cfg.rate/100;
+  var daily=total?salary/total:0;
+  var t=timing();
+  var perMin=t.total?daily/(t.total/60):0;
+  var wd=isWorkday(now);
+  var s=now.getHours()*3600+now.getMinutes()*60+now.getSeconds()+now.getMilliseconds()/1000;
+  var worked=wd?workedSecs(s,t):0;
+  var frac=t.total?worked/t.total:0;
+  var today=daily*frac;
+  var month=before*daily+today;
+  var st,msg,chip;
+  if(!wd){chip='休假日';msg='今日放假,好好休息 🎌';st='rest';}
+  else if(s<t.a){chip='未上班';msg='先飲啖水,準備開工 ☕';st='pre';}
+  else if(s>=t.b){chip='已下班';msg='辛苦晒,收工 🎉';st='post';}
+  else if(t.ov>0&&s>=t.lo&&s<t.hi){chip='午休中';msg='食飽先,午休唔計薪 🍱';st='lunch';}
+  else{chip='上班中';st='work';
+    msg=frac<.25?'新一日開始,慢慢嚟 ☀️':frac<.5?'仲有啲時間,加油 💪':frac<.75?'過咗半場喇 🚶':'快下班了,再忍一下 🙌';}
+  var left=(wd&&s<t.b)?t.b-s:0;
+  var today0=new Date(y,m,td),pd=null;
+  for(var k=0;k<2&&!pd;k++){
+    var dm=new Date(y,m+k+1,0).getDate();
+    var dt=new Date(y,m+k,Math.min(cfg.payday,dm));
+    if(cfg.early){var guard=0;while(bankClosed(dt)&&guard++<10)dt.setDate(dt.getDate()-1);}
+    if(dt>=today0)pd=dt;
+  }
+  var pdDays=pd?Math.round((pd-today0)/86400000):0;
+  var items=cfg.items.filter(function(i){return i&&String(i.n).trim()&&+i.p>0;}).map(function(i){
+    return {e:String(i.e||'').trim()||'🎁',n:String(i.n).trim(),p:+i.p,c:Math.floor(today/+i.p)};});
+  return {wd:wd,st:st,chip:chip,msg:msg,today:today,frac:frac,perMin:perMin,perSec:perMin/60,month:month,salary:salary,
+    monthPct:salary?month/salary*100:0,workdays:total,left:left,pd:pd,pdDays:pdDays,daily:daily,t:t,items:items};
+}
+
+/* ---------- formatting ---------- */
+function yen(n,dp){return '¥'+n.toLocaleString('ja-JP',{minimumFractionDigits:dp,maximumFractionDigits:dp});}
+function digits(str){return str.replace(/[0-9]/g,function(c){return '<span class="d">'+c+'</span>';});}
+function pdText(st){var d=st.pd;return d?(d.getMonth()+1)+'月'+d.getDate()+'日(週'+WKC[d.getDay()]+')':'';}
+function hm(sec){return pad(Math.floor(sec/3600))+':'+pad(Math.floor(sec%3600/60));}
+
+/* ---------- skins ---------- */
+var SKINS={
+  bear:{n:'奶茶熊',e:'🧸',bg:'#fffaf3',page:'#f2dfc8',dark:false},cat:{n:'粉紅喵',e:'🐱',bg:'#fff1f6',page:'#ffdce9',dark:false},
+  frog:{n:'薄荷蛙',e:'🐸',bg:'#ecfaf2',page:'#d3f0e1',dark:false},shiba:{n:'柴柴',e:'🐶',bg:'#fff5e4',page:'#fbe2b6',dark:false},
+  bunny:{n:'星空兔',e:'🐰',bg:'#2d2762',page:'#1c1845',dark:true},pixel:{n:'像素小怪',e:'👾',bg:'#1b2547',page:'#0c1229',dark:true}};
+
+/* ---------- floating-card factory ---------- */
+var instances=new Set();
+var locked=false;
+function makeFW(){
+  var el=document.createElement('div');
+  el.className='fw';
+  el.innerHTML='<div class="fw-bub"><div class="fw-top"><span class="fw-chip"></span><span class="fw-msg"></span></div>'+
+   '<div class="fw-l">今天已經賺了</div><div class="fw-amt"></div><div class="fw-sub"></div>'+
+   '<div class="fw-cd"></div><div class="fw-bar"><i></i></div><div class="fw-pct"></div><hr>'+
+   '<div class="fw-row"><span>本月已賺</span><b class="m"></b></div><div class="fw-row"><span>發薪日</span><b class="p"></b></div>'+
+   '<div class="fw-it"></div></div><div class="fw-char"></div>';
+  var r={chip:$('.fw-chip',el),msg:$('.fw-msg',el),amt:$('.fw-amt',el),sub:$('.fw-sub',el),cd:$('.fw-cd',el),fill:$('.fw-bar i',el),pct:$('.fw-pct',el),m:$('.m',el),p:$('.p',el),it:$('.fw-it',el),ch:$('.fw-char',el)};
+  var inst={el:el,pipWin:null,
+    skin:function(){el.setAttribute('data-skin',cfg.skin);el.setAttribute('data-style',cfg.style);r.ch.textContent=SKINS[cfg.skin].e;
+      if(inst.pipWin){inst.pipWin.document.body.style.background=SKINS[cfg.skin].bg;}},
+    update:function(st){
+      el.setAttribute('data-locked',locked?'1':'0');
+      r.chip.textContent=st.chip;r.msg.textContent=st.msg;
+      var a=digits(yen(st.today,2));if(r.amt.dataset.v!==a){r.amt.innerHTML=a;r.amt.dataset.v=a;}
+      r.sub.innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,3)+'</b> 入帳中':'暫停入帳';
+      r.cd.textContent='⏱ 下班倒數 '+(st.wd?hms(st.left):'--:--:--');
+      r.fill.style.width=(st.frac*100)+'%';r.pct.textContent='今日進度 '+(st.frac*100).toFixed(1)+'%';
+      r.m.textContent=yen(st.month,0);
+      r.p.textContent=st.pdDays===0?'今天發薪!🎉':st.pdDays+' 天後';
+      var shown=st.items.filter(function(i){return i.c>0;}).slice(0,3);
+      r.it.innerHTML=shown.length?shown.map(function(i){return '<span>'+esc(i.e)+'×'+i.c+'</span>';}).join(''):'<span style="color:var(--f-sub)">再賺多啲就買到嘢喇</span>';
+    }};
+  inst.skin();
+  return inst;
+}
+
+/* ---------- home view ---------- */
+var prev=makeFW();$('#prevStage').appendChild(prev.el);instances.add(prev);
+var lastInt=-1;
+function render(){
+  var st=calc(new Date());
+  if(!$('#viewHome').hidden){
+    var big=digits(yen(st.today,2));var T=$('#today');
+    if(T.dataset.v!==big){T.innerHTML=big;T.dataset.v=big;}
+    var ip=Math.floor(st.today);
+    if(ip!==lastInt&&lastInt>=0&&st.st==='work'){T.classList.remove('bump');void T.offsetWidth;T.classList.add('bump');}
+    lastInt=ip;
+    $('#stChip').textContent=st.chip;$('#stMsg').textContent=st.msg;
+    $('#perSecTxt').innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,3)+'</b> 入帳中':'而家暫停入帳';
+    var pc=st.frac*100;
+    $('#barFill').style.width=pc+'%';$('#barMk').style.left=pc+'%';
+    $('#bar').setAttribute('aria-valuenow',pc.toFixed(0));
+    $('#pct').textContent=pc.toFixed(1)+'%';
+    $('#tStart').textContent=hm(st.t.a);$('#tEnd').textContent=hm(st.t.b);
+    $('#cd').textContent=st.wd?hms(st.left):'--:--:--';
+    $('#cdSub').textContent=st.wd?(st.left>0?hm(st.t.b)+' 下班':'今日已經下班'):'今日休假';
+    $('#month').textContent=yen(st.month,0);
+    $('#monthSub').textContent='本月預估 '+yen(st.salary,0)+' · 已達 '+st.monthPct.toFixed(1)+'%';
+    $('#perMin').textContent=yen(st.perMin,2);
+    $('#wdays').textContent=st.workdays+' 天';
+    $('#payV').textContent=st.pdDays===0?'今天發薪!🎉':'仲有 '+st.pdDays+' 天';
+    $('#payS').textContent=pdText(st)+' 發薪 · 每月 '+cfg.payday+' 號'+(cfg.early?'(遇假日提前)':'');
+    var L=$('#itemList'),h='';
+    st.items.forEach(function(i){h+='<span class="item'+(i.c?'':' zero')+'" title="¥'+i.p.toLocaleString('ja-JP')+' / 份"><span class="e">'+esc(i.e)+'</span>'+esc(i.n)+' <b>×'+i.c+'</b></span>';});
+    if(!h)h='<span class="empty">未有項目,去「設定」加幾樣啦。</span>';
+    if(L.dataset.v!==h){L.innerHTML=h;L.dataset.v=h;}
+  }
+  instances.forEach(function(x){x.update(st);});
+}
+
+/* ---------- skin (whole interface) ---------- */
+function drawTpls(){
+  $$('.tpls').forEach(function(box){
+    box.innerHTML='';
+    Object.keys(SKINS).forEach(function(k){
+      var b=document.createElement('button');b.type='button';b.className='tpl';b.setAttribute('data-skin',k);
+      b.setAttribute('role','radio');b.setAttribute('aria-checked',cfg.skin===k?'true':'false');
+      b.innerHTML='<span class="e">'+SKINS[k].e+'</span><span class="n">'+SKINS[k].n+'</span><span class="a">¥1,234</span>';
+      b.onclick=function(){cfg.skin=k;save();applySkin();};
+      box.appendChild(b);
+    });
+  });
+}
+function applySkin(){
+  var S=SKINS[cfg.skin];
+  document.body.setAttribute('data-skin',cfg.skin);
+  document.documentElement.style.background=S.page;
+  document.documentElement.style.colorScheme=S.dark?'dark':'light';
+  drawTpls();
+  $$('[data-logo]').forEach(function(n){n.textContent=S.e;});
+  $('#barMk').textContent=S.e;
+  $$('.stSprout').forEach(function(b){b.setAttribute('aria-pressed',cfg.style==='sprout');});
+  $$('.stCard').forEach(function(b){b.setAttribute('aria-pressed',cfg.style==='card');});
+  instances.forEach(function(x){x.skin();});
+}
+$$('.stSprout').forEach(function(b){b.onclick=function(){cfg.style='sprout';save();applySkin();};});
+$$('.stCard').forEach(function(b){b.onclick=function(){cfg.style='card';save();applySkin();};});
+
+/* ---------- toast ---------- */
+var toastT;
+function toast(msg){
+  var t=$('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);}
+  t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true;},3200);
+}
+
+/* ---------- in-page card ---------- */
+var card=null;
+function openCard(){
+  if(card){closeCard();return;}
+  var inst=makeFW(),wrap=document.createElement('div');wrap.className='pipcard';
+  wrap.innerHTML='<div class="hd"><span>⠿ 拖動位置</span><button type="button" aria-label="關閉小卡">✕</button></div>';
+  wrap.appendChild(inst.el);document.body.appendChild(wrap);
+  instances.add(inst);card={wrap:wrap,inst:inst};
+  $('#btnCard').setAttribute('aria-pressed','true');
+  $('button',wrap).onclick=closeCard;
+  var hd=$('.hd',wrap),sx,sy,ox,oy,drag=false;
+  hd.addEventListener('pointerdown',function(e){if(e.target.tagName==='BUTTON')return;drag=true;var r=wrap.getBoundingClientRect();sx=e.clientX;sy=e.clientY;ox=r.left;oy=r.top;hd.setPointerCapture(e.pointerId);});
+  hd.addEventListener('pointermove',function(e){if(!drag)return;var w=wrap.offsetWidth,h=wrap.offsetHeight;
+    var x=Math.min(Math.max(0,ox+e.clientX-sx),innerWidth-w),y=Math.min(Math.max(0,oy+e.clientY-sy),innerHeight-h);
+    wrap.style.left=x+'px';wrap.style.top=y+'px';wrap.style.right='auto';wrap.style.bottom='auto';});
+  hd.addEventListener('pointerup',function(){drag=false;});
+  render();
+}
+function closeCard(){if(!card)return;instances.delete(card.inst);card.wrap.remove();card=null;$('#btnCard').setAttribute('aria-pressed','false');}
+$('#btnCard').onclick=openCard;
+
+/* ---------- floating window (Document Picture-in-Picture) ---------- */
+var pip=null;
+async function openFloat(){
+  if(pip){try{pip.win.close();}catch(e){}return;}
+  if(!('documentPictureInPicture' in window)){toast('呢個瀏覽器唔支援浮動視窗(要 Chrome / Edge),已改用頁內小卡');if(!card)openCard();return;}
+  try{
+    var w=await window.documentPictureInPicture.requestWindow({width:340,height:420});
+    $$('style,link[rel="stylesheet"]').forEach(function(n){w.document.head.appendChild(n.cloneNode(true));});
+    w.document.body.style.cssText='margin:0;padding:10px;display:flex;justify-content:center;align-items:flex-start;';
+    var inst=makeFW();inst.pipWin=w;inst.skin();inst.el.classList.add('in-pip');
+    w.document.body.appendChild(inst.el);instances.add(inst);pip={win:w,inst:inst};
+    $('#btnFloat').textContent='🪟 關閉浮動視窗';
+    w.addEventListener('pagehide',function(){instances.delete(inst);pip=null;$('#btnFloat').textContent='🪟 浮動視窗';});
+    render();
+  }catch(e){toast('開唔到浮動視窗,已改用頁內小卡');if(!card)openCard();}
+}
+$('#btnFloat').onclick=openFloat;
+
+/* ---------- lock ---------- */
+$('#btnLock').onclick=function(){locked=!locked;document.body.classList.toggle('locked',locked);
+  this.setAttribute('aria-pressed',locked);this.textContent=locked?'🔓 解鎖':'🔒 上鎖';render();};
+
+/* ---------- setup view ---------- */
+var daysBox=$('#days');
+'日月火水木金土'.split('').forEach(function(c,i){
+  var l=document.createElement('label');l.innerHTML='<input type="checkbox" value="'+i+'"> '+c;daysBox.appendChild(l);});
+function fillForm(){
+  $('#salary').value=cfg.salary;$('#rate').value=cfg.rate;$('#start').value=cfg.start;$('#end').value=cfg.end;
+  $('#ls').value=cfg.ls;$('#le').value=cfg.le;$('#payday').value=cfg.payday;$('#jp').checked=cfg.jp;$('#early').checked=cfg.early;
+  $$('input',daysBox).forEach(function(c){c.checked=cfg.days.indexOf(+c.value)>=0;});
+  drawItems();summary();
+}
+function drawItems(){
+  var h='';
+  cfg.items.forEach(function(it,i){
+    h+='<div class="irow" data-i="'+i+'"><input type="text" class="ie" data-k="e" maxlength="4" value="'+esc(it.e)+'" aria-label="圖示">'+
+       '<input type="text" data-k="n" maxlength="14" value="'+esc(it.n)+'" placeholder="名稱" aria-label="名稱">'+
+       '<span class="ip">¥<input type="number" data-k="p" min="1" step="10" inputmode="numeric" value="'+esc(it.p)+'" aria-label="價錢"></span>'+
+       '<button type="button" class="x" data-del="'+i+'" aria-label="刪除這一項">✕</button></div>';
+  });
+  $('#itemEd').innerHTML=h||'<div class="empty">未有項目。按下面「新增一項」。</div>';
+}
+function summary(){
+  var st=calc(new Date());
+  $('#sum').innerHTML='<span>日薪<b>'+yen(st.daily,0)+'</b></span><span>每分鐘<b>'+yen(st.perMin,2)+'</b></span><span>每秒<b>'+yen(st.perSec,3)+'</b></span><span>今個月工作日<b>'+st.workdays+' 日</b></span>';
+}
+function readForm(){
+  var n=function(id,d,lo,hi){var v=parseFloat($(id).value);if(!isFinite(v))return d;return Math.min(hi,Math.max(lo,v));};
+  cfg.salary=n('#salary',DEF.salary,0,100000000);cfg.rate=n('#rate',100,1,100);cfg.payday=Math.round(n('#payday',25,1,31));
+  cfg.start=$('#start').value||DEF.start;cfg.end=$('#end').value||DEF.end;cfg.ls=$('#ls').value||DEF.ls;cfg.le=$('#le').value||DEF.le;
+  cfg.jp=$('#jp').checked;cfg.early=$('#early').checked;
+  cfg.days=$$('input',daysBox).filter(function(c){return c.checked;}).map(function(c){return +c.value;});
+  var w=[];
+  if(toSec(cfg.end)<=toSec(cfg.start))w.push('放工時間要遲過上班時間,暫時用返預設 9:00–18:00 計。');
+  if(!cfg.days.length)w.push('至少揀一日工作日,否則月薪冇得分攤。');
+  var bw=$('#warn');bw.hidden=!w.length;bw.textContent=w.join(' ');
+  $('#btnStart').disabled=!cfg.days.length;
+  save();summary();render();
+}
+$('#viewSetup').addEventListener('input',function(e){
+  var t=e.target;
+  if(t.closest&&t.closest('.irow')){
+    var row=t.closest('.irow'),i=+row.getAttribute('data-i'),k=t.getAttribute('data-k');
+    if(cfg.items[i]){cfg.items[i][k]=(k==='p')?(parseFloat(t.value)||0):t.value;save();render();}
+    return;
+  }
+  readForm();
+});
+$('#viewSetup').addEventListener('click',function(e){
+  var d=e.target.closest&&e.target.closest('[data-del]');
+  if(d){cfg.items.splice(+d.getAttribute('data-del'),1);save();drawItems();render();}
+});
+$('#addItem').onclick=function(){
+  if(cfg.items.length>=12){toast('最多 12 項');return;}
+  cfg.items.push({e:'🎁',n:'新項目',p:500});save();drawItems();render();
+  var rows=$$('.irow input[data-k="n"]');if(rows.length){var last=rows[rows.length-1];last.focus();last.select();}
+};
+$('#resetItems').onclick=function(){cfg.items=clone(DEF_ITEMS);save();drawItems();render();};
+
+/* ---------- view switching ---------- */
+function showView(name){
+  var setup=name==='setup';
+  $('#viewSetup').hidden=!setup;$('#viewHome').hidden=setup;
+  if(setup){
+    fillForm();
+    $('#btnBack').hidden=!cfg.done;
+    $('#setH').textContent=cfg.done?'設定':'先設定一下人工';
+    $('#btnStart').textContent=cfg.done?'儲存並返回 ✨':'開始賺錢 ✨';
+  }
+  window.scrollTo(0,0);render();
+}
+$('#btnStart').onclick=function(){readForm();if(!cfg.days.length)return;cfg.done=true;save();showView('home');};
+$('#btnBack').onclick=function(){showView('home');};
+$('#btnSet').onclick=function(){showView('setup');};
+
+/* ---------- boot ---------- */
+applySkin();
+showView(cfg.done?'home':'setup');
+setInterval(render,100);
+})();
+</script>
+</body></html>
