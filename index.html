@@ -239,10 +239,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
     <section class="card sec">
       <h2>⚔️ 勇者打地下城</h2>
-      <p class="sub">主頁最底有個勇者,每賺夠一定金額就斬一隻怪。</p>
+      <p class="sub">主頁最頂有個勇者,賺到嘅錢會變成怪物賞金。小怪錢少、打得快;每層最尾嘅 BOSS 賞金係小怪嘅好幾倍,要打耐啲。</p>
       <div class="set">
         <label class="chk full"><input type="checkbox" id="dun"> 顯示勇者地下城</label>
-        <div class="f"><label for="bounty" id="bountyLbl">每隻怪值幾多</label><input id="bounty" type="number" min="0.01" step="any" inputmode="decimal"><span class="hint" id="bountyHint"></span></div>
       </div>
     </section>
 
@@ -370,15 +369,14 @@ var CUR={
  GBP:{n:'英鎊',s:'£',d:4,ps:4,step:1,sal:2800,items:[5,9,12,25,45]},
  SGD:{n:'新加坡元',s:'S$',d:4,ps:4,step:1,sal:4000,items:[6,8,15,35,60]}};
 var ITEM_NAMES=[['🧋','廢水'],['🍱','飯盒'],['🎬','睇場戲'],['🍲','打邊爐'],['🎮','課金']];
-var BOUNTY={JPY:5,HKD:1,TWD:2,CNY:1,KRW:50,USD:1,EUR:1,GBP:1,SGD:1};
 var SND={JPY:100,HKD:10,TWD:20,CNY:10,KRW:1000,USD:2,EUR:2,GBP:2,SGD:2};
 function itemsFor(code){return ITEM_NAMES.map(function(x,i){return {e:x[0],n:x[1],p:CUR[code].items[i]};});}
 var DEF_ITEMS=itemsFor('JPY');
 function C(){return CUR[cfg.cur]||CUR.JPY;}
-var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',dun:true,bounty:5,items:DEF_ITEMS};
+var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',dun:true,items:DEF_ITEMS};
 function clone(o){return JSON.parse(JSON.stringify(o));}
 var cfg=load();
-function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});if(j&&j.bounty==null)c.bounty=BOUNTY[c.cur]||5;if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);
+function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);
     var OLDN=['珍奶','便當','戲票','鍋物','Switch 遊戲'];
     if(c.items.length===5&&c.items.every(function(it,i){return it&&it.n===OLDN[i];})){c.items.forEach(function(it,i){it.n=ITEM_NAMES[i][1];});}
     return c;}catch(e){return clone(DEF);}}
@@ -565,14 +563,28 @@ function initDun(){
 var MON=['slime','bat','skeleton','ghost','goblin','spider','mushroom','snake'];
 var BOSS=['dragon','demon','kingslime'];
 var FLOORS=['史萊姆洞窟','骷髏墓穴','哥布林巢穴','毒蛇迷宮','龍之深淵'];
+/* bounty weights (in JPY): small monsters are cheap and quick, the boss of each floor is worth ~6x and takes much longer */
+var MV={slime:2,bat:3,skeleton:3,ghost:3,goblin:4,spider:4,mushroom:2,snake:3},BV=18;
+var SCL={JPY:1,HKD:.2,TWD:.4,CNY:.2,KRW:10,USD:.2,EUR:.2,GBP:.2,SGD:.2};
+function money(w){return Math.round(w*(SCL[cfg.cur]||1)*100)/100;}
+function fm(v){var dp=Number.isInteger(v)?0:((v*10)%1===0?1:2);return yen(v,dp);}
+function slot(f,j){
+  if(j===8)return {k:BOSS[f%BOSS.length],boss:true,v:money(BV)};
+  var t=MON[(j+f)%MON.length];return {k:t,boss:false,v:money(MV[t])};
+}
+function slotK(k){return slot(Math.floor(k/9),k%9);}
+function floorTotal(){var t=0;for(var j=0;j<9;j++)t+=slot(0,j).v;return t;}
+function locate(today){
+  var T=floorTotal(),f=Math.max(0,Math.floor(today/T+1e-9)),rem=today-f*T;
+  for(var j=0;j<9;j++){var s=slot(f,j);if(rem<s.v-1e-9||j===8)return {f:f,j:j,s:s,prog:Math.min(1,Math.max(0,rem/s.v))};rem-=s.v;}
+}
+function hitsOf(s){return s.boss?8:3;}
 var dK=-1,dH=0,dBusy=false;
-function monFor(k){var boss=(k%10)===9;return {k:boss?BOSS[Math.floor(k/10)%BOSS.length]:MON[(k*5+Math.floor(k/10)*3)%MON.length],boss:boss};}
-function hitsFor(k){return monFor(k).boss?6:4;}
 function setHp(f){$('#hpFill').style.width=Math.max(0,Math.min(1,f))*100+'%';}
 function showMon(k){
-  var m=monFor(k),el=$('#mon'),im=$('#monSp');
-  im.src=spURL(m.k);sz(im,m.k,3);el.classList.toggle('boss',m.boss);
-  el.classList.remove('die','flinch');$('.hp',el).style.setProperty('--n',hitsFor(k));
+  var s=slotK(k),el=$('#mon'),im=$('#monSp');
+  im.src=spURL(s.k);sz(im,s.k,3);el.classList.toggle('boss',s.boss);
+  el.classList.remove('die','flinch');$('.hp',el).style.setProperty('--n',hitsOf(s));
 }
 function spark(stg,small){
   var fx=document.createElement('img');fx.className='fx'+(small?' s':'');fx.src=spURL('burst');stg.appendChild(fx);
@@ -580,36 +592,37 @@ function spark(stg,small){
 }
 function swing(stg){stg.classList.remove('atk');void stg.offsetWidth;stg.classList.add('atk');}
 function dungeon(st){
-  var card=$('#dunCard'),on=cfg.dun&&cfg.bounty>0;
+  var card=$('#dunCard'),on=cfg.dun;
   card.hidden=!on;
   if(!on){dK=-1;return;}
   if(!dInit)initDun();
-  var r=st.today/cfg.bounty,k=Math.floor(r+1e-9),prog=Math.min(1,Math.max(0,r-k));
+  var L=locate(st.today),k=L.f*9+L.j,prog=L.prog,cur=L.s,n=hitsOf(cur);
   var stg=$('#stage'),mon=$('#mon');
   stg.setAttribute('data-s',st.st==='work'?'work':'rest');
   if(dK<0||k<dK||k-dK>3||document.hidden){
-    dK=k;dH=Math.floor(prog*hitsFor(k));
-    if(!dBusy){showMon(k);setHp(1-dH/hitsFor(k));}
+    dK=k;dH=Math.floor(prog*n);
+    if(!dBusy){showMon(k);setHp(1-dH/n);}
   }else if(k>dK){
-    /* final blow: the bounty is complete */
-    dK=k;dH=Math.floor(prog*hitsFor(k));
+    /* final blow: this monster's bounty is complete */
+    var dead=slotK(k-1);
+    dK=k;dH=Math.floor(prog*n);
     if(!dBusy){
       dBusy=true;swing(stg);
       setTimeout(function(){
         setHp(0);mon.classList.add('die');spark(stg,false);
         var g=document.createElement('span');g.className='gain amt';
         var ci=document.createElement('img');ci.src=spURL('coin');g.appendChild(ci);
-        g.appendChild(document.createTextNode('+'+yen(cfg.bounty,cfg.bounty<1?2:0)));stg.appendChild(g);
+        g.appendChild(document.createTextNode('+'+fm(dead.v)));stg.appendChild(g);
         setTimeout(function(){g.remove();},1000);
       },260);
       setTimeout(function(){
-        showMon(dK);setHp(1-dH/hitsFor(dK));mon.classList.remove('in');void mon.offsetWidth;mon.classList.add('in');
+        showMon(dK);setHp(1-dH/hitsOf(slotK(dK)));mon.classList.remove('in');void mon.offsetWidth;mon.classList.add('in');
       },820);
       setTimeout(function(){stg.classList.remove('atk');mon.classList.remove('in');dBusy=false;},1300);
     }
   }else if(!dBusy){
-    /* the monster's HP is cut in equal chunks: one sword hit each time a chunk of the bounty is earned */
-    var n=hitsFor(dK),h=Math.min(n-1,Math.floor(prog*n));
+    /* HP is cut in equal chunks: one sword hit each time a chunk of this monster's bounty is earned */
+    var h=Math.min(n-1,Math.floor(prog*n));
     if(h>dH){
       dH=h;dBusy=true;swing(stg);
       setTimeout(function(){
@@ -618,9 +631,8 @@ function dungeon(st){
       setTimeout(function(){stg.classList.remove('atk');mon.classList.remove('flinch');dBusy=false;},680);
     }else if(h<dH){dH=h;setHp(1-dH/n);}
   }
-  var fl=Math.floor(dK/10)+1,inF=dK%10;
-  $('#dunCnt').innerHTML='第 <b>'+fl+'</b> 層・'+FLOORS[(fl-1)%FLOORS.length]+'・今日斬咗 <b>'+dK+'</b> 隻';
-  $('#dunSub').textContent='每賺 '+yen(cfg.bounty,cfg.bounty<1?2:0)+' 斬一隻'+(inF===9?'(呢隻係BOSS!)':'')+'・下一隻仲差 '+yen(Math.max(0,cfg.bounty*(1-prog)),2);
+  $('#dunCnt').innerHTML='第 <b>'+(L.f+1)+'</b> 層・'+FLOORS[L.f%FLOORS.length]+'・今日斬咗 <b>'+dK+'</b> 隻';
+  $('#dunSub').textContent=(cur.boss?'BOSS 賞金 '+fm(cur.v)+'!':'呢隻賞金 '+fm(cur.v))+'・仲差 '+yen(Math.max(0,cur.v*(1-prog)),2)+' 就斬死佢';
 }
 
 /* ---------- coin sound ---------- */
@@ -663,7 +675,7 @@ var daysBox=$('#days');
 '日一二三四五六'.split('').forEach(function(c,i){
   var l=document.createElement('label');l.innerHTML='<input type="checkbox" value="'+i+'"> '+c;daysBox.appendChild(l);});
 function fillForm(){
-  $('#cur').value=cfg.cur;$('#snd').checked=cfg.snd;$('#sndStep').value=cfg.sndStep;$('#vol').value=cfg.vol;$('#dun').checked=cfg.dun;$('#bounty').value=cfg.bounty;
+  $('#cur').value=cfg.cur;$('#snd').checked=cfg.snd;$('#sndStep').value=cfg.sndStep;$('#vol').value=cfg.vol;$('#dun').checked=cfg.dun;
   $('#salary').value=cfg.salary;$('#rate').value=cfg.rate;$('#start').value=cfg.start;$('#end').value=cfg.end;
   $('#ls').value=cfg.ls;$('#le').value=cfg.le;$('#payday').value=cfg.payday;$('#jp').checked=cfg.jp;$('#early').checked=cfg.early;
   $$('input',daysBox).forEach(function(c){c.checked=cfg.days.indexOf(+c.value)>=0;});
@@ -683,7 +695,6 @@ function fmtMin(m){return m<1?Math.max(1,Math.round(m*60))+' 秒':(m<10?m.toFixe
 function summary(){
   var st=calc(new Date());
   $('#sndHint2').textContent=st.perMin>0?'以而家嘅人工,大約每 '+fmtMin(cfg.sndStep/st.perMin)+' 響一次':'';
-  $('#bountyHint').textContent=st.perMin>0&&cfg.bounty>0?'以而家嘅人工,大約每 '+fmtMin(cfg.bounty/st.perMin)+' 斬一隻':'';
   $('#sum').innerHTML='<span>日薪<b>'+yen(st.daily,0)+'</b></span><span>每分鐘<b>'+yen(st.perMin,2)+'</b></span><span>每秒<b>'+yen(st.perSec,C().ps)+'</b></span><span>今個月工作日<b>'+st.workdays+' 日</b></span>';
 }
 var curSel=$('#cur');
@@ -694,7 +705,6 @@ function applyCurUI(){
   $('#subT').textContent='按'+c.n+'計・每一秒都有錢落袋';
   var base=SND[cfg.cur]||100;
   $('#sndPresets').innerHTML=[1,5,10,50].map(function(x){return '<button type="button" class="pill" data-preset="'+(base*x)+'">'+esc(yen(base*x,0))+'</button>';}).join('');
-  $('#bountyLbl').textContent='每隻怪值幾多('+c.s+')';
   $('#sndLbl').textContent='每賺到幾多('+c.s+')響一次';
   drawTpls();
 }
@@ -706,14 +716,13 @@ function readForm(){
     else{toast('你自訂嘅物品價錢冇自動轉換,請自己檢查');}
     if(+$('#salary').value===CUR[old].sal){$('#salary').value=CUR[nc].sal;}
     if(+$('#sndStep').value===SND[old]){$('#sndStep').value=SND[nc];}
-    if(+$('#bounty').value===BOUNTY[old]){$('#bounty').value=BOUNTY[nc];}
     cfg.cur=nc;drawItems();applyCurUI();
   }
   var n=function(id,d,lo,hi){var v=parseFloat($(id).value);if(!isFinite(v))return d;return Math.min(hi,Math.max(lo,v));};
   cfg.salary=n('#salary',DEF.salary,0,100000000);cfg.rate=n('#rate',100,1,100);cfg.payday=Math.round(n('#payday',25,1,31));
   cfg.start=$('#start').value||DEF.start;cfg.end=$('#end').value||DEF.end;cfg.ls=$('#ls').value||DEF.ls;cfg.le=$('#le').value||DEF.le;
   cfg.jp=$('#jp').checked;cfg.early=$('#early').checked;
-  cfg.snd=$('#snd').checked;cfg.sndStep=n('#sndStep',SND[cfg.cur]||100,0.01,1e9);cfg.vol=n('#vol',60,0,100);cfg.dun=$('#dun').checked;cfg.bounty=n('#bounty',BOUNTY[cfg.cur]||5,0.01,1e9);dK=-1;lastMs=-1;syncSndBtn();updateSndNote();
+  cfg.snd=$('#snd').checked;cfg.sndStep=n('#sndStep',SND[cfg.cur]||100,0.01,1e9);cfg.vol=n('#vol',60,0,100);cfg.dun=$('#dun').checked;dK=-1;lastMs=-1;syncSndBtn();updateSndNote();
   cfg.days=$$('input',daysBox).filter(function(c){return c.checked;}).map(function(c){return +c.value;});
   var w=[];
   if(toSec(cfg.end)<=toSec(cfg.start))w.push('放工時間要遲過上班時間,暫時用返預設 9:00–18:00 計。');
