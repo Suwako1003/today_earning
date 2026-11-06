@@ -632,7 +632,7 @@ function dungeon(st){
     }else if(h<dH){dH=h;setHp(1-dH/n);}
   }
   $('#dunCnt').innerHTML='第 <b>'+(L.f+1)+'</b> 層・'+FLOORS[L.f%FLOORS.length]+'・今日斬咗 <b>'+dK+'</b> 隻';
-  $('#dunSub').textContent=(cur.boss?'BOSS 賞金 '+fm(cur.v)+'!':'呢隻賞金 '+fm(cur.v))+'・仲差 '+yen(Math.max(0,cur.v*(1-prog)),2)+' 就斬死佢';
+  $('#dunSub').textContent=cur.boss?'BOSS 值 '+fm(cur.v)+',打贏佢就發達!頂住!':'呢隻怪值 '+fm(cur.v)+','+['加油斬!','斬佢!','衝呀!','輕輕鬆鬆!'][k%4];
 }
 
 /* ---------- coin sound ---------- */
