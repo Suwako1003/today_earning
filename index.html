@@ -218,6 +218,37 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
 .lrow .lamt.i{color:#2a9468}
 .lrow .x{border:0;background:transparent;width:28px;height:28px;border-radius:var(--rp);line-height:1}
 .lrow .x:hover{background:var(--accent);color:var(--accent-ink)}
+
+/* ---- forest rest scenes: lunch (eat by the fire) and off-work / not yet started / day off (tent + fireflies) ---- */
+.stage .forest{position:absolute;inset:0;display:none;background:linear-gradient(#0e182c 0,#1a3042 55%,#27483f 100%);overflow:hidden}
+.stage[data-s="lunch"] .forest,.stage[data-s="camp"] .forest{display:block}
+.stage[data-s="lunch"] .torch,.stage[data-s="camp"] .torch,.stage[data-s="lunch"] .mon,.stage[data-s="camp"] .mon,.stage[data-s="camp"] .hero2{display:none}
+.stage[data-s="lunch"] .ground,.stage[data-s="camp"] .ground{background:#2f5d3a var(--grass) 0 0/48px 48px repeat-x}
+.stage .forest img{position:absolute;display:block;image-rendering:pixelated;max-width:none}
+.forest .moon{right:8%;top:12px;width:32px;height:32px}
+.forest .tr{bottom:30px;width:38px;height:52px;filter:brightness(.5) saturate(.8)}
+.forest .trn{bottom:22px;width:57px;height:78px;filter:brightness(.8)}
+.stage .forest .tent{left:36%;bottom:30px;width:78px;height:51px;display:none}
+.stage[data-s="camp"] .forest .tent{display:block}
+.forest .cf{position:absolute;left:62%;bottom:30px;width:32px;height:44px}
+.forest .cf .logs{left:0;bottom:0;width:32px;height:10px}
+.forest .cf .fa,.forest .cf .fb{left:4px;bottom:6px;width:24px;height:28px}
+.forest .cf .fb{animation:tfl .4s steps(1) infinite}
+.forest .zzz{display:none;position:absolute;left:calc(36% + 50px);bottom:78px;width:0;height:0}
+.stage[data-s="camp"] .forest .zzz{display:block}
+.zzz b{position:absolute;left:0;bottom:0;font:700 14px/1 'DotGothic16',var(--num),monospace;color:#d6e4ff;text-shadow:2px 2px 0 #0b1220;opacity:0;animation:zup 2.7s steps(9) infinite}
+.zzz b:nth-child(2){animation-delay:.9s;font-size:17px}.zzz b:nth-child(3){animation-delay:1.8s;font-size:20px}
+@keyframes zup{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(24px,-50px);opacity:0}}
+.stage[data-s="lunch"] .hero2{left:36%}
+.stage[data-s="lunch"] .hero2 .sw{display:none}
+.stage[data-s="lunch"].atk .hero2{animation:none}
+.stage .hero2 .food{display:none;position:absolute;left:36px;top:20px;width:27px;height:24px;z-index:2}
+.stage[data-s="lunch"] .hero2 .food{display:block;animation:chew .7s steps(1) infinite}
+.stage[data-s="lunch"] .hero2 .sp{animation:bob .8s steps(1) infinite}
+@keyframes chew{50%{transform:translateY(-3px)}}
+.ff{position:absolute;width:4px;height:4px;background:#eaff7a;box-shadow:0 0 0 2px rgba(234,255,122,.25),0 0 10px 3px rgba(234,255,122,.4);animation:ffd var(--t,7s) steps(14) infinite alternate,ffb var(--b,1.6s) steps(4) infinite}
+@keyframes ffd{0%{transform:translate(0,0)}33%{transform:translate(var(--dx),calc(var(--dy)*.4))}66%{transform:translate(calc(var(--dx)*.3),var(--dy))}100%{transform:translate(calc(var(--dx)*-.6),calc(var(--dy)*.2))}}
+@keyframes ffb{0%,100%{opacity:.25}50%{opacity:1}}
 </style>
 
 <div class="wrap" id="app">
@@ -336,9 +367,10 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
     <section class="card dun" id="dunCard" aria-label="勇者地下城">
       <div class="dunhead"><h2>勇者戰況</h2><span class="amt" id="dunCnt"></span></div>
       <div class="stage" id="stage" data-s="work">
+        <div class="forest" aria-hidden="true"><img class="moon" id="moonSp" alt=""><span id="trees"></span><img class="tent" id="tentSp" alt=""><span class="cf"><img class="logs" id="logsSp" alt=""><img class="fa" id="cfA" alt=""><img class="fb" id="cfB" alt=""></span><span class="zzz"><b>Z</b><b>z</b><b>Z</b></span><span id="ffs"></span></div>
         <span class="torch t1" aria-hidden="true"><img class="tA" id="tcA1" alt=""><img class="tB" id="tcB1" alt=""></span>
         <span class="torch t2" aria-hidden="true"><img class="tA" id="tcA2" alt=""><img class="tB" id="tcB2" alt=""></span>
-        <div class="hero2" id="hero" aria-hidden="true"><span class="fire"><img class="fa" alt=""><img class="fb" alt=""></span><img class="sp" id="heroSp" alt=""><img class="sw" id="swordSp" alt=""><span class="zz">Zz</span></div>
+        <div class="hero2" id="hero" aria-hidden="true"><span class="fire"><img class="fa" alt=""><img class="fb" alt=""></span><img class="sp" id="heroSp" alt=""><img class="sw" id="swordSp" alt=""><span class="zz">Zz</span><img class="food" id="foodSp" alt=""></div>
         <div class="mon" id="mon" aria-hidden="true"><div class="hp"><i id="hpFill"></i></div><img class="sp" id="monSp" alt=""></div>
         <div class="ground"></div>
       </div>
@@ -687,6 +719,7 @@ function toast(msg){
 var SPR={"hero":{"p":{"K":"#1a1423","S":"#f5c9a0","s":"#d9a070","H":"#c9d3e6","h":"#8793b2","A":"#4a6fd0","a":"#2f4a9a","C":"CAPE","c":"CAPEDK","B":"#8a5a2b","G":"#f2d060","W":"#ffffff","E":"#1a1423"},"g":["......KKKKK.....",".....KHHHHHK....","....KHHhhHHHK...","....KHHHHHHHK...","....KHSSSSSSK...","....KHSEESEEK...",".....KSSSSSK....","..KKKKKKKKKK....",".KCCKAAAAAAKK...",".KCCKAAGGAAKSK..",".KcCKAAAAAAKSK..",".KcCKBBBBBBKK...","..KcKAAAAAAK....","...KKAAKKAAK....","....KaaK.KaaK...","...KKKK...KKKK.."]},"sword":{"p":{"K":"#1a1423","W":"#ffffff","L":"#c9d6ea","l":"#8b9cc0","G":"#f2d060","B":"#8a5a2b"},"g":["..KK..",".KWLK.",".KWLK.",".KWLK.",".KWLK.",".KWlK.",".KWlK.",".KWlK.",".KWlK.",".KWlK.",".KWlK.","KKGGKK","KGGGGK",".KBBK.",".KBBK.","..KK.."]},"slime":{"p":{"K":"#1a1423","G":"#4ed36a","g":"#2a9e48","L":"#a8f5b8","W":"#ffffff"},"g":["................","................","................","................",".....KKKKKK.....","....KGGGGGGK....","...KGLLGGGGGK...","..KGLLGGGGGGGK..","..KGGGGGGGGGGK..",".KGGWWGGGWWGGGK.",".KGGWKGGGWKGGGK.",".KGGGGGGGGGGGgK.",".KGGGGKKKKGGGgK.","..KGGGGGGGGGggK.","...KKGggggggKK..",".....KKKKKKKK..."]},"bat":{"p":{"K":"#1a1423","P":"#8a4fd0","p":"#5a2f99","R":"#ff4a4a","W":"#ffffff"},"g":["................",".KK..........KK.",".KPK........KPK.",".KPPK..KK..KPPK.",".KPPPKKPPKKPPPK.",".KPpPPPPPPPPpPK.","..KPpPPPPPPpPK..","..KPPPWRPWRPPK..","...KPPPPPPPPK...","....KPPWPWPK....",".....KPPPPK.....","......KppK......",".......KK.......","................","................","................"]},"skeleton":{"p":{"K":"#1a1423","W":"#f2f0e6","w":"#bdb9a6","R":"#ff4a4a"},"g":[".....KKKKKK.....","....KWWWWWWK....","...KWWWWWWWWK...","...KWKKWWKKWK...","...KWKRWWKRWK...","...KWWWKKWWWK...","....KWWWWWWK....",".....KWKWKWK....","....KKWWWWWKK...","...KWKWKwKWKWK..","....KKWWWWWKK...",".....KWKwKWK....","......KWWWK.....",".....KWK.KWK....","....KKK...KKK...","................"]},"ghost":{"p":{"K":"#1a1423","W":"#f4f7ff","b":"#b9c8ee","B":"#8ea2d8","E":"#1a1423","P":"#ffb3c8"},"g":[".....KKKKKK.....","....KWWWWWWK....","...KWWWWWWWWK...","..KWWWWWWWWWWK..","..KWWEEWWEEWWK..","..KWWEEWWEEWWK..","..KWWWWWWWWWWK..","..KWPWWKKWWPWK..","..KWWWWKKWWWWK..","..KbWWWWWWWWbK..","..KbWWWWWWWWbK..","..KBbWWWWWWbBK..","..KBbWWbbWWbBK..","..KBKbWKKbWKBK..","...K.KBK.KBK.K..","................"]},"goblin":{"p":{"K":"#1a1423","G":"#7ac943","g":"#4e9a2a","Y":"#ffe14a","R":"#c0392b","B":"#8a5a2b","W":"#ffffff"},"g":["................","KK............KK","KGKK.KKKKKK.KKGK",".KGGKKGGGGGKKGK.","..KGGGGGGGGGGK..","..KGGYKGGKYGGK..","..KGGKKGGKKGGK..","..KGGGGGGGGGGK..","...KGRWWWWRGK...","....KKGGGGKK....","...KBBBBBBBBK...","..KGKBBBBBBKGK..","..KGKBBKKBBKGK..","...KKBBK.KBBKK..","....KgK...KgK...","...KKKK...KKKK.."]},"spider":{"p":{"K":"#1a1423","D":"#d9822b","d":"#8f4f14","R":"#ff3b3b","W":"#ffffff"},"g":["................","................","K..K........K..K",".KK.K......K.KK.","...KDK.KK.KDK...","K...KDDDDDDK...K",".KK.KDDDDDDK.KK.","...KDDRDDRDDK...","KKKKDDRDDRDDKKKK","...KDDDWWDDDK...",".KK.KDDDDDDK.KK.","K...KDDddDDK...K","...KKDDDDDDKK...","..KK.KKKKKK.KK..",".KK..........KK.","K..............K"]},"mushroom":{"p":{"K":"#1a1423","R":"#e0453a","r":"#a82a24","W":"#ffffff","T":"#f3dcb0","t":"#c9a878","E":"#1a1423"},"g":["................","......KKKK......","....KKRRRRKK....","...KRRWWRRRRK...","..KRRWWWRRWWRK..","..KRRRWRRRWWRK..",".KRRRRRRRRRRRrK.",".KRWWRRRWWRRRrK.",".KRWWRRRWWRRRrK.",".KrrrrrrrrrrrrK.","..KKKKTTTTKKKK..",".....KTEETTK....",".....KTEETTK....",".....KTTTTtK....","....KKTTTttKK...","....KKKKKKKKK..."]},"snake":{"p":{"K":"#1a1423","G":"#d4a020","g":"#9a7010","Y":"#ffe14a","R":"#ff3b3b","W":"#ffffff"},"g":["................","....KKKK........","...KYYYGK.......","..KGYRGRGK......","..KGGGGGGK......","..KGGWKKGK......","...KKGGGK.......","....KGGGK.......","...KGGgGK.KKK...","..KGGgGGKKGGGK..",".KGGgGGGGGGggGK.",".KGgGGKKGGgGGGK.",".KGGGK..KGGGgK..","..KGGK...KKKK...","...KKK..........","................"]},"dragon":{"p":{"K":"#1a1423","R":"#d9382b","r":"#8f1f1a","O":"#ff8a3a","Y":"#ffe14a","W":"#ffffff","B":"#f3dcb0"},"g":["........................","..KK................KK..",".KRRK..............KRRK.",".KRRRK............KRRRK.","..KRRRKKKKKKKKKKKKRRRK..","...KRRRRRRRRRRRRRRRRK...","....KRRRRRRRRRRRRRRK....","...KRRRYYRRRRRRYYRRRK...","...KRRRYKRRRRRRKYRRRK...","...KRRRRRRRRRRRRRRRRK...","....KRRRRRRKKRRRRRRK....","....KRRRRRRRRRRRRRRK....","...KKRRWRRWRRRWRRWRKK...","..KRRKRRKRRKRRKRRKRRRK..",".KRRRKRRRRRRRRRRRRKRRRK.",".KRRRKOOOOOOOOOOOOKRRRK.",".KRRrKOOOOOOOOOOOOKrRRK.","..KKrKOOOOOOOOOOOOKrKK..","....KKOOOOOOOOOOOOKK....","....KRRKOOOOOOOOKRRK....","....KRRRKKOOOOKKRRRK....","...KRRRRRKKKKKKRRRRRK...","..KBBKKKKK....KKKKBBK...","..KKK............KKK...."]},"demon":{"p":{"K":"#1a1423","P":"#7a3ad0","p":"#4c218f","H":"#f3dcb0","R":"#ff3b3b","Y":"#ffe14a","W":"#ffffff","M":"#c0392b"},"g":["..KK..............KK....",".KHHK............KHHK...",".KHHK............KHHK...",".KHHHK..........KHHHK...","..KHHHKKKKKKKKKKHHHK....","...KKPPPPPPPPPPPPKK.....","....KPPPPPPPPPPPPK......","...KPPYYPPPPPPYYPPK.....","...KPPYRPPPPPPRYPPK.....","...KPPPPPPPPPPPPPPK.....","...KPPPPKKKKKKPPPPK.....","...KPPPKWMWMWMKPPPK.....","....KPPPKKKKKKPPPK......",".....KKPPPPPPPPKK.......","...KKPPKPPPPPPKPPKK.....","..KPPPPKPppppPKPPPPK....",".KPPPPPKPppppPKPPPPPK...",".KPPKKPKPppppPKPKKPPK...",".KKK.KPKPppppPKPK.KKK...","......KPPPppPPPPK.......","......KPPPPPPPPPK.......",".....KPPPK..KPPPK.......",".....KPPPK..KPPPK.......","....KKKKKK..KKKKKK......"]},"kingslime":{"p":{"K":"#1a1423","G":"#4ed36a","g":"#2a9e48","L":"#a8f5b8","W":"#ffffff","Y":"#ffd23a","y":"#c9971a","R":"#ff4a4a","B":"#3a6fe0"},"g":["........................","........................","......K....K....K.......",".....KYK..KYK..KYK......",".....KYYKKYYKKYYK.......",".....KYYYYYYYYYYK.......",".....KYBYYRYYBYYK.......","......KKKKKKKKKK........","........KKKKKK..........","......KKGGGGGGKK........","....KKGGLLGGGGGGKK......","...KGGLLLGGGGGGGGGK.....","..KGGLLGGGGGGGGGGGGK....","..KGGGGGGGGGGGGGGGGK....",".KGGGWWWGGGGGWWWGGGGK...",".KGGGWKKWGGGWKKWGGGGK...",".KGGGWKKWGGGWKKWGGGGgK..",".KGGGGWWGGGGGWWGGGGGgK..",".KGGGGGGGGGGGGGGGGGGgK..",".KGGGGGGKKKKKKGGGGGGgK..","..KGGGGGGKWWWKGGGGGGgK..","..KgGGGGGGKKKGGGGGGggK..","...KKgggggggggggggKKK...",".....KKKKKKKKKKKKKK....."]},"torch1":{"p":{"K":"#1a1423","B":"#8a5a2b","b":"#5e3b1a","R":"#e0453a","O":"#ff8a3a","Y":"#ffe14a","W":"#fff6c0"},"g":["....R...","...ROR..","..RROYR.","..ROYYR.","..ROYWR.","...RYYR.","...KBBK.","...KBbK.","...KBbK.","...KBbK.","...KBbK.","....KK.."]},"torch2":{"p":{"K":"#1a1423","B":"#8a5a2b","b":"#5e3b1a","R":"#e0453a","O":"#ff8a3a","Y":"#ffe14a","W":"#fff6c0"},"g":["........","....R...","...RO...","..ROYR..","..ROYYR.","..ROYWR.","...RYYR.","...KBBK.","...KBbK.","...KBbK.","...KBbK.","....KK.."]},"burst":{"p":{"Y":"#ffe14a","O":"#ff8a3a","R":"#e0453a","W":"#ffffff"},"g":["......Y..Y......",".R....Y..Y....R.","..R...O..O...R..","...O..O..O..O...","....O.YYYY.O....",".....YYWWYYY....","YYOOYYWWWWYYOOYY","....YYWWWWYY....","YYOOYYWWWWYYOOYY",".....YYWWYYY....","....O.YYYY.O....","...O..O..O..O...","..R...O..O...R..",".R....Y..Y....R.","......Y..Y......","................"]},"coin":{"p":{"K":"#1a1423","Y":"#ffd23a","y":"#c9971a","W":"#fff6c0"},"g":["..KKKK..",".KYYYYK.","KYWYYyyK","KYWYyyyK","KYYYyyyK","KYYYyyyK",".KYYyyK.","..KKKK.."]}};
 SPR.flame1={p:{R:'#e0453a',O:'#ff8a3a',Y:'#ffe14a',W:'#fff6c0'},g:["......R.....",".....RR.....","....RRO.R...","...RRORRR...","..RRROORR...","..RROOYORR..",".RROOYYOORR.",".RROYYWYOOR.",".RROYWWYOOR.",".RROYWWYOOR.","..RROYYYORR.","..RRROOORR..","...RRRRRR...","....RRRR...."]};
 SPR.flame2={p:SPR.flame1.p,g:[".......R....","......RR....","...R.RRO....","...RRRORR...","...RROORRR..","..RROYOORR..","..ROOYYOORR.",".RROYYWYOOR.",".RROYWWYOOR.",".RROYWWYOOR.","..RROYYYORR.","..RRROOORR..","...RRRRRR...","....RRRR...."]};
+Object.assign(SPR,{"pine":{"p":{"K":"#0d1b16","G":"#2e6b49","g":"#3f8a5c","d":"#245640","T":"#5e3b1a"},"g":["........KKK........",".......KGGGK.......",".......KGGGK.......","......KGGGGGK......","......KGGGGGK......",".....KGgGGGdGK.....",".....KgGGGGGGK.....","....KgGGGGGGGdK....","....KGGgGGGGdGK....",".....KgGGGGdGK.....","....KgGGGGGGGGK....","....KGGgGGGGGdK....","...KGGgGGGGGdGGK...","...KGgGGGGGdGGGK...","..KGgGGgGGGGGGdGK..","...KKKgGGGGGGKKK...","....KgGGGGGGdGK....","...KgGGgGGGdGGGK...","..KgGGgGGGGGGGdGK..","..KGGgGGGGGGGdGGK..",".KGGgGGgGGGGdGGGdK.","KGGgGGgGGGGdGGGdGGK",".KKKKKKKTTTKKKKKKK.",".......KTTTK.......",".......KTTTK.......","........KKK........"]},"tent":{"p":{"K":"#1a1423","O":"#f0a43a","o":"#d9822b","Y":"#fff0b0","y":"#f2c060","D":"#3a2412","R":"#e0453a","s":"#1c3b2d"},"g":["............KRRK..........","...........KOooK..........","..........KOYoooK.........",".........KOYOooooK........","........KOYOOooooyK.......","........KYOODDDoyoK.......",".......KYOOODDDyoooK......","......KYOOODDDDDooooK.....",".....KYOOOODDDDDooooyK....","....KYOOOODDDDDDDooyooK...","...KYOOOOODDDDDDDoyooooK..","..KYOOOOODDDDDDDDDooooooK.",".KYOOOOOODDDDDDDDDoooooyoK","KYOOOOOODDDDDDDDDDDoooyooo","KOOOOOODDDDDDDDDDDDDoyoooo",".KssssssssssssssssssssssKK","..KKKKKKKKKKKKKKKKKKKKKK.."]},"logs":{"p":{"K":"#1a1423","B":"#8a5a2b","b":"#5e3b1a"},"g":["...KBBBBBBBBK...","..KBbBBBBBBbBK..",".KBBBbbBBbbBBBK.","KBbBBBBKKBBBBbBK",".KKKKKKKKKKKKKK."]},"onigiri":{"p":{"K":"#1a1423","W":"#ffffff","N":"#1f3a2a"},"g":["....K....","...KWK...","..KWWWK..",".KWWWWWK.",".KWWWWWK.","KWWNNNWWK","KWNNNNNWK",".KKKKKKK."]},"moon":{"p":{"K":"#1a1423","Y":"#fff2b0"},"g":["..KKKK..",".KYYYK..","KYYYK...","KYYK....","KYYK....","KYYYK...",".KYYYKK.","..KKKKK."]}});
 var CAPE={bear:'#c98a5c',cat:'#e8548b',frog:'#2a9468',shiba:'#c97312',bunny:'#7a68ee',pixel:'#2fb866'};
 var spC={};
 function shadeHex(h,f){var n=parseInt(h.slice(1),16),r=(n>>16)*f,g=((n>>8)&255)*f,b=(n&255)*f;return '#'+[r,g,b].map(function(v){return ('0'+Math.round(v).toString(16)).slice(-2);}).join('');}
@@ -707,6 +740,9 @@ function tileURL(kind){
       for(var bx=-8;bx<16;bx+=16){var bxx=bx+off;
         r('#372f4d',bxx+1,y0+1,15,7);r('#4a4066',bxx+1,y0+1,15,1);r('#2c253f',bxx+1,y0+7,15,1);
         r('#413758',bxx+4,y0+4,2,1);r('#2c253f',bxx+10,y0+3,1,1);}}
+  }else if(kind==='grass'){
+    r('#2f5d3a',0,0,16,16);r('#4a8a4e',0,0,16,2);r('#3f7a45',0,2,16,1);
+    r('#3f7a45',2,5,1,2);r('#3f7a45',9,7,1,2);r('#3f7a45',13,4,1,2);r('#24472e',5,11,2,1);r('#24472e',11,13,2,1);r('#24472e',1,9,1,1);r('#5aa05a',6,3,1,1);r('#5aa05a',12,1,1,1);
   }else{
     r('#5b4a6e',0,0,16,16);r('#8a76a8',0,0,16,2);r('#75628c',0,2,16,1);
     r('#3b304b',0,8,16,1);r('#3b304b',0,15,16,1);r('#3b304b',8,0,1,8);r('#3b304b',3,8,1,8);
@@ -721,6 +757,18 @@ function initDun(){
   st.style.setProperty('--brick','url('+tileURL('brick')+')');st.style.setProperty('--floor','url('+tileURL('floor')+')');
   $('#tcA1').src=$('#tcA2').src=spURL('torch1');$('#tcB1').src=$('#tcB2').src=spURL('torch2');
   $('#swordSp').src=spURL('sword');
+  $('#moonSp').src=spURL('moon');$('#tentSp').src=spURL('tent');$('#logsSp').src=spURL('logs');
+  $('#cfA').src=spURL('flame1');$('#cfB').src=spURL('flame2');$('#foodSp').src=spURL('onigiri');
+  st.style.setProperty('--grass','url('+tileURL('grass')+')');
+  var th='',pu=spURL('pine');
+  for(var i=0;i<12;i++)th+='<img class="tr" src="'+pu+'" alt="" style="left:'+(i*9.4-3)+'%;height:'+(48+(i*7)%9)+'px">';
+  th+='<img class="trn" src="'+pu+'" alt="" style="left:-1%"><img class="trn" src="'+pu+'" alt="" style="right:1%">';
+  $('#trees').innerHTML=th;
+  var ff='',sd=7;
+  function rnd(){sd=(sd*9301+49297)%233280;return sd/233280;}
+  for(var j=0;j<12;j++)ff+='<i class="ff" style="left:'+(6+rnd()*88).toFixed(1)+'%;top:'+(24+rnd()*88).toFixed(0)+'px;--dx:'+((rnd()-.5)*64).toFixed(0)+'px;--dy:'+((rnd()-.5)*34).toFixed(0)+'px;--t:'+(5+rnd()*5).toFixed(1)+'s;--b:'+(1.2+rnd()*1.6).toFixed(1)+'s;animation-delay:-'+(rnd()*6).toFixed(1)+'s,-'+(rnd()*2).toFixed(1)+'s"></i>';
+  $('#ffs').innerHTML=ff;
+
   $$('.fire .fa').forEach(function(i){i.src=spURL('flame1');});$$('.fire .fb').forEach(function(i){i.src=spURL('flame2');});
   $('#heroSp').src=spURL('hero',CAPE[cfg.skin]);
 }
@@ -762,7 +810,7 @@ function dungeon(st){
   if(!dInit)initDun();
   var L=locate(st.today),k=L.f*9+L.j,prog=L.prog,cur=L.s,n=hitsOf(cur);
   var stg=$('#stage'),mon=$('#mon');
-  stg.setAttribute('data-s',st.st==='ot'?'ot':st.st==='work'?'work':'rest');
+  stg.setAttribute('data-s',st.st==='ot'?'ot':st.st==='work'?'work':st.st==='lunch'?'lunch':'camp');
   if(dK<0||k<dK||k-dK>3||document.hidden){
     dK=k;dH=Math.floor(prog*n);
     if(!dBusy){showMon(k);setHp(1-dH/n);}
@@ -798,6 +846,9 @@ function dungeon(st){
   $('#dunCnt').innerHTML='第 <b>'+(L.f+1)+'</b> 層・'+FLOORS[L.f%FLOORS.length]+'・今日斬咗 <b>'+dK+'</b> 隻';
   var sub=cur.boss?'BOSS 值 '+fm(cur.v)+',打贏佢就發達!頂住!':'呢隻怪值 '+fm(cur.v)+','+['加油斬!','斬佢!','衝呀!','輕輕鬆鬆!'][k%4];
   if(st.st==='ot')sub=cfg.otPay?'🔥 加班模式!勇者燃燒緊 · '+sub:'🔥 加班冇加班費…勇者靠意志力燃燒緊';
+
+  var SUBS={lunch:'🍙 食緊飯…勇者離開咗地下城,去咗森林紮營歎茶休息(午休唔計錢)',pre:'🌲 勇者喺森林帳篷瞓緊,等你開工 💤',post:'🌙 收工喇!勇者喺森林帳篷瞓緊,螢火蟲陪住佢 💤',rest:'🏕️ 休假日,勇者喺森林露營,慢慢嚟 💤'};
+  if(SUBS[st.st])sub=SUBS[st.st];
   $('#dunSub').textContent=sub;
 }
 
