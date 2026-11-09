@@ -183,15 +183,13 @@ body[data-mode="hero"] .tick-only{display:none}
 body[data-mode="ticker"] #dunCard{display:none}
 .stage .fire{display:none}
 .stage[data-s="ot"] .fire{display:block}
-.stage .fl{position:absolute}
-.stage .fl img{position:absolute;inset:0;width:100%;height:100%}
-.stage .fl .fb{animation:tfl .35s steps(1) infinite}
-.stage .f1{left:6px;top:-30px;width:36px;height:42px}
-.stage .f2{left:-14px;top:6px;width:24px;height:28px}
-.stage .f3{left:38px;top:10px;width:24px;height:28px}
-.stage .f2 .fb{animation-delay:.12s}.stage .f3 .fb{animation-delay:.2s}
+.stage .fire{position:absolute;left:-12px;bottom:-2px;width:72px;height:84px;opacity:.72;z-index:0;pointer-events:none}
+.stage .fire img{position:absolute;inset:0;width:100%;height:100%}
+.stage .fire .fb{animation:tfl .35s steps(1) infinite}
+.stage .hero2 .sp{position:relative;z-index:1}
+.stage .hero2 .sw{z-index:2}
 .stage[data-s="ot"]{box-shadow:0 0 0 2px var(--line),inset 0 0 44px rgba(255,80,30,.5)}
-.stage[data-s="ot"] .hero2 .sp{animation:bob .3s steps(1) infinite;filter:saturate(1.5) brightness(1.15) sepia(.3) hue-rotate(-12deg)}
+.stage[data-s="ot"] .hero2 .sp{animation:bob .3s steps(1) infinite}
 .stage[data-s="ot"] .mon .sp{animation:bob .7s steps(1) infinite}
 .net .k{color:var(--muted);font-size:13px}
 .net .big2{font-family:var(--num);font-weight:700;font-size:clamp(32px,8vw,52px);line-height:1.15;margin:4px 0;white-space:nowrap}
@@ -340,7 +338,7 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
       <div class="stage" id="stage" data-s="work">
         <span class="torch t1" aria-hidden="true"><img class="tA" id="tcA1" alt=""><img class="tB" id="tcB1" alt=""></span>
         <span class="torch t2" aria-hidden="true"><img class="tA" id="tcA2" alt=""><img class="tB" id="tcB2" alt=""></span>
-        <div class="hero2" id="hero" aria-hidden="true"><img class="sp" id="heroSp" alt=""><img class="sw" id="swordSp" alt=""><span class="zz">Zz</span><span class="fire"><span class="fl f1"><img class="fa" alt=""><img class="fb" alt=""></span><span class="fl f2"><img class="fa" alt=""><img class="fb" alt=""></span><span class="fl f3"><img class="fa" alt=""><img class="fb" alt=""></span></span></div>
+        <div class="hero2" id="hero" aria-hidden="true"><span class="fire"><img class="fa" alt=""><img class="fb" alt=""></span><img class="sp" id="heroSp" alt=""><img class="sw" id="swordSp" alt=""><span class="zz">Zz</span></div>
         <div class="mon" id="mon" aria-hidden="true"><div class="hp"><i id="hpFill"></i></div><img class="sp" id="monSp" alt=""></div>
         <div class="ground"></div>
       </div>
@@ -413,7 +411,8 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
       <div class="k">淨資產</div>
       <div class="big2 amt" id="lgNet">0</div>
       <div class="s amt" id="lgNetSub"></div>
-      <div class="f" style="margin-top:12px"><label for="lgInit" id="lgInitLbl">期初資產(你而家有幾多錢)</label><input id="lgInit" type="number" step="any" inputmode="decimal" placeholder="0"></div>
+      <div class="f" style="margin-top:12px"><label for="lgInit" id="lgInitLbl">期初資產(之前已有嘅儲蓄,冇可以唔填)</label><input id="lgInit" type="number" step="any" inputmode="decimal" placeholder="0"></div>
+      <div class="f" style="margin-top:10px"><label for="lgSince">由邊日開始自動計入工資</label><input id="lgSince" type="date"><span class="hint">工資由 app 自動計,每日收工後先入帳(今日賺嘅聽日先計入);想包返之前,將日期改早啲。</span></div>
     </section>
 
     <section class="card sec">
@@ -469,7 +468,7 @@ var SND={JPY:100,HKD:10,TWD:20,CNY:10,KRW:1000,USD:2,EUR:2,GBP:2,SGD:2};
 function itemsFor(code){return ITEM_NAMES.map(function(x,i){return {e:x[0],n:x[1],p:CUR[code].items[i]};});}
 var DEF_ITEMS=itemsFor('JPY');
 function C(){return CUR[cfg.cur]||CUR.JPY;}
-var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',mode:'hero',otPay:true,otRate:2000,ot:{since:null,log:{}},ledger:{init:0,items:[]},items:DEF_ITEMS};
+var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',mode:'hero',otPay:true,otRate:2000,ot:{since:null,log:{}},ledger:{init:0,since:null,pay:{},items:[]},items:DEF_ITEMS};
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function fixCfg(c,j){
   if(!j||!j.mode)c.mode=(j&&j.dun===false)?'ticker':'hero';
@@ -481,6 +480,8 @@ function fixCfg(c,j){
   if(!c.ledger||typeof c.ledger!=='object')c.ledger={init:0,items:[]};
   if(!Array.isArray(c.ledger.items))c.ledger.items=[];
   c.ledger.init=+c.ledger.init||0;
+  if(!c.ledger.pay||typeof c.ledger.pay!=='object')c.ledger.pay={};
+  if(typeof c.ledger.since!=='string')c.ledger.since=null;
   if(!j||j.otRate==null||!(+c.otRate>=0))c.otRate=OTR[c.cur]||2000;
   c.otPay=!!c.otPay;
 }
@@ -538,6 +539,26 @@ function otCalc(now){
   if(o.since!=null)keys[ymd(new Date(o.since))]=1;
   var ms=0;Object.keys(keys).forEach(function(k){if(k.slice(0,7)===pre)ms+=otDaySecs(k,nowMs);});
   return {on:on,active:active,secs:secs,pay:secs*rate,monthPay:ms*rate};
+}
+
+/* ---------- ledger: wages credited automatically once a work day has finished ---------- */
+function dayPay(d){
+  var y=d.getFullYear(),mo=d.getMonth(),dim=new Date(y,mo+1,0).getDate(),total=0;
+  for(var i=1;i<=dim;i++)if(isWorkday(new Date(y,mo,i)))total++;
+  var reg=(isWorkday(d)&&total)?cfg.salary*cfg.rate/100/total:0;
+  var secs=cfg.ot.log[ymd(d)]||0,ot=cfg.otPay?secs*(+cfg.otRate||0)/3600:0;
+  return Math.round((reg+ot)*100)/100;
+}
+function ledgerSync(now){
+  var L=cfg.ledger;if(!L.since)return false;
+  var today=new Date(now.getFullYear(),now.getMonth(),now.getDate()),d=dayStart(L.since),ch=false,n=0;
+  while(d<today&&n++<1500){var ds=ymd(d);if(L.pay[ds]==null){L.pay[ds]=dayPay(d);ch=true;}d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);}
+  return ch;
+}
+function wageSum(prefix){
+  var L=cfg.ledger,t=0,today=ymd(new Date());
+  Object.keys(L.pay).forEach(function(k){if(L.since&&k>=L.since&&k<today&&(!prefix||k.slice(0,prefix.length)===prefix))t+=L.pay[k];});
+  return Math.round(t*100)/100;
 }
 
 /* ---------- core calculation ---------- */
@@ -823,12 +844,13 @@ $('#btnOT').onclick=function(){
 };
 
 var LGC={e:[['food','🍜','飲食'],['home','🏠','住屋'],['util','💡','水電煤'],['trans','🚃','交通'],['phone','📱','通訊'],['shop','🛍️','購物'],['fun','🎮','娛樂'],['med','💊','醫療'],['edu','📚','學習'],['ins','🛡️','保險/稅'],['gift','🎁','人情/禮物'],['oth','📦','其他']],
-         i:[['sal','💴','薪水'],['bon','🎉','獎金'],['ot','🔥','加班費'],['side','💼','副業'],['oth','📦','其他']]};
+         i:[['bon','🎉','獎金'],['side','💼','副業'],['int','📈','利息/投資'],['oth','📦','其他']],
+         old:[['sal','💴','薪水'],['ot','🔥','加班費']]};
 var PIEC=['#e8548b','#f2a33a','#4ba3e0','#2a9468','#8a5ad0','#e0453a','#2ec4b6','#c9971a','#6a7fdb','#d96bb0','#8d6e63','#7f8c8d'];
 var lg={mon:'',all:false,type:'e'};
 function ym(d){return d.getFullYear()+'-'+pad(d.getMonth()+1);}
 function lgM(n){n=Math.round(n*100)/100;return yen(n,Number.isInteger(n)?0:2);}
-function lgCat(t,k){var l=LGC[t];for(var i=0;i<l.length;i++)if(l[i][0]===k)return l[i];return l[l.length-1];}
+function lgCat(t,k){var l=LGC[t].concat(t==='i'?LGC.old:[]);for(var i=0;i<l.length;i++)if(l[i][0]===k)return l[i];return LGC[t][LGC[t].length-1];}
 function lgFill(){
   $('#lgCat').innerHTML=LGC[lg.type].map(function(c){return '<option value="'+c[0]+'">'+c[1]+' '+esc(c[2])+'</option>';}).join('');
   $('#lgTE').setAttribute('aria-pressed',lg.type==='e');$('#lgTI').setAttribute('aria-pressed',lg.type==='i');
@@ -836,22 +858,25 @@ function lgFill(){
 function lgOpen(){
   lg.mon=ym(new Date());lg.all=false;lg.type='e';
   var L=cfg.ledger;
-  $('#lgInit').value=L.init||'';$('#lgDate').value=ymd(new Date());$('#lgAmt').value='';$('#lgNote').value='';
-  $('#lgAmtLbl').textContent='金額('+C().s+')';$('#lgInitLbl').textContent='期初資產('+C().s+',你而家有幾多錢)';
+  otRoll();if(!L.since){L.since=ymd(new Date());save();}
+  if(ledgerSync(new Date()))save();
+  $('#lgInit').value=L.init||'';$('#lgSince').value=L.since;$('#lgDate').value=ymd(new Date());$('#lgAmt').value='';$('#lgNote').value='';
+  $('#lgAmtLbl').textContent='金額('+C().s+')';$('#lgInitLbl').textContent='期初資產('+C().s+',之前已有嘅儲蓄,冇可以唔填)';
   lgFill();lgRender();
 }
 function lgRender(){
-  var L=cfg.ledger,all=L.items,I=0,E=0;
+  var L=cfg.ledger,all=L.items,I=0,E=0,W=wageSum('');
   all.forEach(function(x){if(x.t==='i')I+=x.a;else E+=x.a;});
-  var net=L.init+I-E;
+  var net=L.init+W+I-E;
   var nb=$('#lgNet');nb.textContent=(net<0?'-':'')+lgM(Math.abs(net));nb.classList.toggle('neg',net<0);
-  $('#lgNetSub').textContent='期初 '+lgM(L.init)+' + 收入 '+lgM(I)+' − 支出 '+lgM(E);
+  $('#lgNetSub').textContent='期初 '+lgM(L.init)+' + 工資(截至昨日收工) '+lgM(W)+' + 其他收入 '+lgM(I)+' − 支出 '+lgM(E);
   var sel=lg.all?all:all.filter(function(x){return x.d.slice(0,7)===lg.mon;});
   $('#lgMonT').textContent=lg.all?'全部記錄':lg.mon.slice(0,4)+' 年 '+(+lg.mon.slice(5,7))+' 月';
   $('#lgPrev').hidden=$('#lgNext').hidden=lg.all;$('#lgAll').setAttribute('aria-pressed',lg.all);$('#lgAll').textContent=lg.all?'分月睇':'全部';
-  var si=0,se=0,by={};
+  var si=0,se=0,by={},sw=wageSum(lg.all?'':lg.mon);
   sel.forEach(function(x){if(x.t==='i')si+=x.a;else{se+=x.a;by[x.c]=(by[x.c]||0)+x.a;}});
-  $('#lgSum').innerHTML='<span>收入<b class="amt">'+lgM(si)+'</b></span><span>支出<b class="amt">'+lgM(se)+'</b></span><span>結餘<b class="amt">'+(si-se<0?'-':'')+lgM(Math.abs(si-se))+'</b></span>';
+  var bal=sw+si-se;
+  $('#lgSum').innerHTML='<span>工資(自動)<b class="amt">'+lgM(sw)+'</b></span><span>其他收入<b class="amt">'+lgM(si)+'</b></span><span>支出<b class="amt">'+lgM(se)+'</b></span><span>結餘<b class="amt">'+(bal<0?'-':'')+lgM(Math.abs(bal))+'</b></span>';
   var ks=Object.keys(by).sort(function(a,b){return by[b]-by[a];});
   if(!ks.length){
     $('#lgPie').innerHTML='';$('#lgLegend').innerHTML='<div class="empty">'+(lg.all?'未有支出記錄':'呢個月未有支出記錄')+',喺上面記一筆啦。</div>';
@@ -879,6 +904,7 @@ $('#lgPrev').onclick=function(){var p=lg.mon.split('-');lg.mon=ym(new Date(+p[0]
 $('#lgNext').onclick=function(){var p=lg.mon.split('-');lg.mon=ym(new Date(+p[0],+p[1],1));lgRender();};
 $('#lgAll').onclick=function(){lg.all=!lg.all;lgRender();};
 $('#lgInit').addEventListener('input',function(){cfg.ledger.init=parseFloat(this.value)||0;save();lgRender();});
+$('#lgSince').addEventListener('change',function(){if(!this.value)return;cfg.ledger.since=this.value;if(ledgerSync(new Date()))save();save();lgRender();});
 $('#lgAdd').onclick=function(){
   var a=parseFloat($('#lgAmt').value);
   if(!(a>0)){toast('請輸入大過 0 嘅金額');$('#lgAmt').focus();return;}
