@@ -411,8 +411,9 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
       <div class="k">淨資產</div>
       <div class="big2 amt" id="lgNet">0</div>
       <div class="s amt" id="lgNetSub"></div>
+      <div class="s amt" id="lgPend" style="margin-top:4px"></div>
       <div class="f" style="margin-top:12px"><label for="lgInit" id="lgInitLbl">期初資產(之前已有嘅儲蓄,冇可以唔填)</label><input id="lgInit" type="number" step="any" inputmode="decimal" placeholder="0"></div>
-      <div class="f" style="margin-top:10px"><label for="lgSince">由邊日開始自動計入工資</label><input id="lgSince" type="date"><span class="hint">工資由 app 自動計,每日收工後先入帳(今日賺嘅聽日先計入);想包返之前,將日期改早啲。</span></div>
+      <div class="f" style="margin-top:10px"><label for="lgSince">由邊個月開始疊加工資</label><input id="lgSince" type="month"><span class="hint">由嗰個月 1 號起,每個工作日收工後工資自動疊上去(今日賺嘅聽日先計入)。揀 11 月就會計返 11/1 起所有已收工嘅日子。</span></div>
     </section>
 
     <section class="card sec">
@@ -482,6 +483,7 @@ function fixCfg(c,j){
   c.ledger.init=+c.ledger.init||0;
   if(!c.ledger.pay||typeof c.ledger.pay!=='object')c.ledger.pay={};
   if(typeof c.ledger.since!=='string')c.ledger.since=null;
+  else c.ledger.since=c.ledger.since.slice(0,7)+'-01';
   if(!j||j.otRate==null||!(+c.otRate>=0))c.otRate=OTR[c.cur]||2000;
   c.otPay=!!c.otPay;
 }
@@ -858,9 +860,9 @@ function lgFill(){
 function lgOpen(){
   lg.mon=ym(new Date());lg.all=false;lg.type='e';
   var L=cfg.ledger;
-  otRoll();if(!L.since){L.since=ymd(new Date());save();}
+  otRoll();if(!L.since){var n0=new Date();L.since=ymd(new Date(n0.getFullYear(),n0.getMonth(),1));save();}
   if(ledgerSync(new Date()))save();
-  $('#lgInit').value=L.init||'';$('#lgSince').value=L.since;$('#lgDate').value=ymd(new Date());$('#lgAmt').value='';$('#lgNote').value='';
+  $('#lgInit').value=L.init||'';$('#lgSince').value=L.since.slice(0,7);$('#lgDate').value=ymd(new Date());$('#lgAmt').value='';$('#lgNote').value='';
   $('#lgAmtLbl').textContent='金額('+C().s+')';$('#lgInitLbl').textContent='期初資產('+C().s+',之前已有嘅儲蓄,冇可以唔填)';
   lgFill();lgRender();
 }
@@ -869,6 +871,8 @@ function lgRender(){
   all.forEach(function(x){if(x.t==='i')I+=x.a;else E+=x.a;});
   var net=L.init+W+I-E;
   var nb=$('#lgNet');nb.textContent=(net<0?'-':'')+lgM(Math.abs(net));nb.classList.toggle('neg',net<0);
+  var td=calc(new Date()),pend=(L.since&&L.since<=ymd(new Date())&&td.today>0)?td.today:0;
+  $('#lgPend').textContent=pend>0?'今日賺緊 '+lgM(pend)+(td.st==='work'||td.st==='lunch'||td.st==='ot'?'(未收工,聽日先入帳)':'(聽日先入帳)'):(L.since&&L.since<=ymd(new Date())?'今日未有工資入緊(休假日或未上班)':'');
   $('#lgNetSub').textContent='期初 '+lgM(L.init)+' + 工資(截至昨日收工) '+lgM(W)+' + 其他收入 '+lgM(I)+' − 支出 '+lgM(E);
   var sel=lg.all?all:all.filter(function(x){return x.d.slice(0,7)===lg.mon;});
   $('#lgMonT').textContent=lg.all?'全部記錄':lg.mon.slice(0,4)+' 年 '+(+lg.mon.slice(5,7))+' 月';
@@ -904,7 +908,7 @@ $('#lgPrev').onclick=function(){var p=lg.mon.split('-');lg.mon=ym(new Date(+p[0]
 $('#lgNext').onclick=function(){var p=lg.mon.split('-');lg.mon=ym(new Date(+p[0],+p[1],1));lgRender();};
 $('#lgAll').onclick=function(){lg.all=!lg.all;lgRender();};
 $('#lgInit').addEventListener('input',function(){cfg.ledger.init=parseFloat(this.value)||0;save();lgRender();});
-$('#lgSince').addEventListener('change',function(){if(!this.value)return;cfg.ledger.since=this.value;if(ledgerSync(new Date()))save();save();lgRender();});
+$('#lgSince').addEventListener('change',function(){if(!this.value)return;cfg.ledger.since=this.value+'-01';if(ledgerSync(new Date()))save();save();lgRender();});
 $('#lgAdd').onclick=function(){
   var a=parseFloat($('#lgAmt').value);
   if(!(a>0)){toast('請輸入大過 0 嘅金額');$('#lgAmt').focus();return;}
