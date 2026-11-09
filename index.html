@@ -139,9 +139,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .stage .fx.s{width:40px;height:40px;right:calc(12% + 4px);bottom:58px;animation-duration:.4s}
 .stage[data-s="work"] .hero2 .sp{animation:bob .6s steps(1) infinite}
 .stage[data-s="work"] .mon .sp{animation:bob .8s steps(1) infinite}
-.stage:not([data-s="work"]) .hero2 .zz{display:block;animation:zzb 1.2s steps(1) infinite}
-.stage:not([data-s="work"]) .hero2 .sp{filter:grayscale(.5) brightness(.85)}
-.stage:not([data-s="work"]) .mon .sp{filter:brightness(.8)}
+.stage[data-s="rest"] .hero2 .zz{display:block;animation:zzb 1.2s steps(1) infinite}
+.stage[data-s="rest"] .hero2 .sp{filter:grayscale(.5) brightness(.85)}
+.stage[data-s="rest"] .mon .sp{filter:brightness(.8)}
 @keyframes bob{50%{transform:translateY(-3px)}}
 @keyframes zzb{50%{transform:translateY(-4px)}}
 .stage.atk .hero2{animation:lunge .62s steps(8) 1}
@@ -177,6 +177,49 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 @media (prefers-reduced-motion:reduce){
   .bump{animation:none}
 }
+
+/* ---- mode / overtime / ledger ---- */
+body[data-mode="hero"] .tick-only{display:none}
+body[data-mode="ticker"] #dunCard{display:none}
+.stage .fire{display:none}
+.stage[data-s="ot"] .fire{display:block}
+.stage .fl{position:absolute}
+.stage .fl img{position:absolute;inset:0;width:100%;height:100%}
+.stage .fl .fb{animation:tfl .35s steps(1) infinite}
+.stage .f1{left:6px;top:-30px;width:36px;height:42px}
+.stage .f2{left:-14px;top:6px;width:24px;height:28px}
+.stage .f3{left:38px;top:10px;width:24px;height:28px}
+.stage .f2 .fb{animation-delay:.12s}.stage .f3 .fb{animation-delay:.2s}
+.stage[data-s="ot"]{box-shadow:0 0 0 2px var(--line),inset 0 0 44px rgba(255,80,30,.5)}
+.stage[data-s="ot"] .hero2 .sp{animation:bob .3s steps(1) infinite;filter:saturate(1.5) brightness(1.15) sepia(.3) hue-rotate(-12deg)}
+.stage[data-s="ot"] .mon .sp{animation:bob .7s steps(1) infinite}
+.net .k{color:var(--muted);font-size:13px}
+.net .big2{font-family:var(--num);font-weight:700;font-size:clamp(32px,8vw,52px);line-height:1.15;margin:4px 0;white-space:nowrap}
+.net .big2.neg{color:#c2452d}
+.net .s{color:var(--muted);font-size:12.5px}
+.seg{display:flex;gap:8px}
+input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--rs);padding:8px 10px;width:100%;min-width:0}
+.lgmon{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lgmon b{font-family:var(--num);font-size:16px;min-width:110px;text-align:center}
+.lgsum{display:flex;gap:6px 18px;flex-wrap:wrap;margin-top:10px}
+.lgsum span{font-size:12.5px;color:var(--muted)}
+.lgsum b{font-family:var(--num);font-size:17px;margin-left:4px;color:var(--ink)}
+.donutwrap{display:flex;gap:16px 22px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.pie{width:190px;height:190px;flex:0 0 auto}
+.pie text{fill:var(--ink);font-family:var(--num);text-anchor:middle}
+.legend{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:7px}
+.lgrow{display:grid;grid-template-columns:14px minmax(0,1fr) auto 40px;gap:8px;align-items:center;font-size:13px}
+.lgrow i{width:12px;height:12px;border-radius:4px;display:block}
+.lgrow b{font-family:var(--num)}
+.lgrow em{font-style:normal;color:var(--muted);text-align:right}
+.lglist{display:flex;flex-direction:column;gap:6px}
+.lrow{display:grid;grid-template-columns:42px 24px minmax(0,1fr) auto 30px;gap:8px;align-items:center;background:var(--soft);border-radius:var(--rs);padding:6px 10px;font-size:13px}
+.lrow .ld{color:var(--muted);font-family:var(--num)}
+.lrow .ln{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow .lamt{font-family:var(--num);font-weight:600}
+.lrow .lamt.i{color:#2a9468}
+.lrow .x{border:0;background:transparent;width:28px;height:28px;border-radius:var(--rp);line-height:1}
+.lrow .x:hover{background:var(--accent);color:var(--accent-ink)}
 </style>
 
 <div class="wrap" id="app">
@@ -238,10 +281,17 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     </section>
 
     <section class="card sec">
-      <h2>⚔️ 勇者打地下城</h2>
-      <p class="sub">主頁最頂有個勇者,賺到嘅錢會變成怪物賞金。小怪錢少、打得快;每層最尾嘅 BOSS 賞金係小怪嘅好幾倍,要打耐啲。</p>
+      <h2>🎮 顯示方式</h2>
+      <p class="sub">預設係勇者打地下城(唔顯示大跳字金額)。想直接睇錢跳,就轉做跳字計錢。</p>
+      <div class="set"><div class="f full"><label for="mode">主頁顯示</label><select id="mode"><option value="hero">⚔️ 勇者打地下城(預設)</option><option value="ticker">🔢 跳字計錢</option></select></div></div>
+    </section>
+
+    <section class="card sec">
+      <h2>🔥 加班</h2>
+      <p class="sub">收工後喺主頁撳「🔥 加班」就會繼續計時,要自己撳「結束加班」先會停。</p>
       <div class="set">
-        <label class="chk full"><input type="checkbox" id="dun"> 顯示勇者地下城</label>
+        <label class="chk full"><input type="checkbox" id="otPay"> 加班有加班費</label>
+        <div class="f"><label for="otRate" id="otLbl">加班時薪</label><input id="otRate" type="number" min="0" step="any" inputmode="decimal"><span class="hint" id="otHint"></span></div>
       </div>
     </section>
 
@@ -279,6 +329,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       <nav aria-label="功能">
         <button class="pill" id="btnLock" type="button" aria-pressed="false">🙈 咪偷睇</button>
         <button class="pill" id="btnSnd" type="button" aria-pressed="false">🔕 金錢聲</button>
+        <button class="pill" id="btnOT" type="button" aria-pressed="false">🔥 加班</button>
+        <button class="pill" id="btnLedger" type="button">📒 記帳</button>
         <button class="pill" id="btnSet" type="button">⚙️ 設定</button>
       </nav>
     </header>
@@ -288,7 +340,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       <div class="stage" id="stage" data-s="work">
         <span class="torch t1" aria-hidden="true"><img class="tA" id="tcA1" alt=""><img class="tB" id="tcB1" alt=""></span>
         <span class="torch t2" aria-hidden="true"><img class="tA" id="tcA2" alt=""><img class="tB" id="tcB2" alt=""></span>
-        <div class="hero2" id="hero" aria-hidden="true"><img class="sp" id="heroSp" alt=""><img class="sw" id="swordSp" alt=""><span class="zz">Zz</span></div>
+        <div class="hero2" id="hero" aria-hidden="true"><img class="sp" id="heroSp" alt=""><img class="sw" id="swordSp" alt=""><span class="zz">Zz</span><span class="fire"><span class="fl f1"><img class="fa" alt=""><img class="fb" alt=""></span><span class="fl f2"><img class="fa" alt=""><img class="fb" alt=""></span><span class="fl f3"><img class="fa" alt=""><img class="fb" alt=""></span></span></div>
         <div class="mon" id="mon" aria-hidden="true"><div class="hp"><i id="hpFill"></i></div><img class="sp" id="monSp" alt=""></div>
         <div class="ground"></div>
       </div>
@@ -300,9 +352,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 
     <section class="card hero">
       <div class="chiprow"><span class="chip" id="stChip">扮工中</span><span class="chip msg" id="stMsg"></span></div>
-      <div class="lbl">今日賺左</div>
-      <div class="big amt" id="today" aria-live="off">¥0.00</div>
-      <div class="rate" id="perSecTxt"></div>
+      <div class="lbl tick-only">今日賺左</div>
+      <div class="big amt tick-only" id="today" aria-live="off">¥0.00</div>
+      <div class="rate tick-only" id="perSecTxt"></div>
       <div class="bar" role="progressbar" aria-label="今日進度" aria-valuemin="0" aria-valuemax="100" id="bar">
         <i id="barFill"></i><span class="mk" id="barMk" aria-hidden="true">🧸</span>
       </div>
@@ -345,6 +397,49 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       <div class="tpls" role="radiogroup" aria-label="造型"></div>
     </section>
   </div>
+  <div class="view" id="viewLedger" hidden>
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">📒</div>
+        <div>
+          <h1>記帳・淨資產</h1>
+          <p>記低使咗幾多、使喺邊,一眼睇到消費比例。</p>
+        </div>
+      </div>
+      <nav><button class="pill" id="btnLgBack" type="button">← 返回</button></nav>
+    </header>
+
+    <section class="card net">
+      <div class="k">淨資產</div>
+      <div class="big2 amt" id="lgNet">0</div>
+      <div class="s amt" id="lgNetSub"></div>
+      <div class="f" style="margin-top:12px"><label for="lgInit" id="lgInitLbl">期初資產(你而家有幾多錢)</label><input id="lgInit" type="number" step="any" inputmode="decimal" placeholder="0"></div>
+    </section>
+
+    <section class="card sec">
+      <h2>＋ 記一筆</h2>
+      <div class="seg" role="group" aria-label="類型"><button class="pill" type="button" id="lgTE" aria-pressed="true">支出</button><button class="pill" type="button" id="lgTI" aria-pressed="false">收入</button></div>
+      <div class="set" style="margin-top:12px">
+        <div class="f"><label for="lgAmt" id="lgAmtLbl">金額</label><input id="lgAmt" type="number" min="0" step="any" inputmode="decimal"></div>
+        <div class="f"><label for="lgCat">類別</label><select id="lgCat"></select></div>
+        <div class="f"><label for="lgDate">日期</label><input id="lgDate" type="date"></div>
+        <div class="f"><label for="lgNote">備註(用咗落咩度)</label><input id="lgNote" type="text" maxlength="30" placeholder="例:便利店飯糰"></div>
+        <div class="f full"><button class="pill primary" type="button" id="lgAdd">＋ 記低</button></div>
+      </div>
+    </section>
+
+    <section class="card sec">
+      <div class="lgmon"><button class="pill" id="lgPrev" type="button" aria-label="上個月">◀</button><b id="lgMonT"></b><button class="pill" id="lgNext" type="button" aria-label="下個月">▶</button><button class="pill" id="lgAll" type="button" aria-pressed="false">全部</button></div>
+      <div class="lgsum" id="lgSum"></div>
+      <h2 style="margin-top:16px">🥧 支出比例</h2>
+      <div class="donutwrap"><div id="lgPie"></div><div class="legend" id="lgLegend"></div></div>
+    </section>
+
+    <section class="card sec">
+      <h2>🧾 記錄</h2>
+      <div class="lglist" id="lgList"></div>
+    </section>
+  </div>
   <footer class="foot">開發者:Samuel J</footer>
 </div>
 
@@ -369,14 +464,29 @@ var CUR={
  GBP:{n:'英鎊',s:'£',d:4,ps:4,step:1,sal:2800,items:[5,9,12,25,45]},
  SGD:{n:'新加坡元',s:'S$',d:4,ps:4,step:1,sal:4000,items:[6,8,15,35,60]}};
 var ITEM_NAMES=[['🧋','廢水'],['🍱','飯盒'],['🎬','睇場戲'],['🍲','打邊爐'],['🎮','課金']];
+var OTR={JPY:2000,HKD:200,TWD:350,CNY:90,KRW:15000,USD:30,EUR:25,GBP:22,SGD:30};
 var SND={JPY:100,HKD:10,TWD:20,CNY:10,KRW:1000,USD:2,EUR:2,GBP:2,SGD:2};
 function itemsFor(code){return ITEM_NAMES.map(function(x,i){return {e:x[0],n:x[1],p:CUR[code].items[i]};});}
 var DEF_ITEMS=itemsFor('JPY');
 function C(){return CUR[cfg.cur]||CUR.JPY;}
-var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',dun:true,items:DEF_ITEMS};
+var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:100,start:'09:00',end:'18:00',ls:'12:00',le:'13:00',days:[1,2,3,4,5],jp:true,payday:25,early:true,skin:'bear',mode:'hero',otPay:true,otRate:2000,ot:{since:null,log:{}},ledger:{init:0,items:[]},items:DEF_ITEMS};
 function clone(o){return JSON.parse(JSON.stringify(o));}
+function fixCfg(c,j){
+  if(!j||!j.mode)c.mode=(j&&j.dun===false)?'ticker':'hero';
+  if(c.mode!=='ticker')c.mode='hero';
+  delete c.dun;delete c.bounty;
+  if(!c.ot||typeof c.ot!=='object')c.ot={since:null,log:{}};
+  if(!c.ot.log||typeof c.ot.log!=='object')c.ot.log={};
+  if(c.ot.since===undefined)c.ot.since=null;
+  if(!c.ledger||typeof c.ledger!=='object')c.ledger={init:0,items:[]};
+  if(!Array.isArray(c.ledger.items))c.ledger.items=[];
+  c.ledger.init=+c.ledger.init||0;
+  if(!j||j.otRate==null||!(+c.otRate>=0))c.otRate=OTR[c.cur]||2000;
+  c.otPay=!!c.otPay;
+}
+
 var cfg=load();
-function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);
+function load(){try{var j=JSON.parse(localStorage.getItem(STORE)||'null');var c=Object.assign(clone(DEF),j||{});fixCfg(c,j);if(!Array.isArray(c.items))c.items=clone(DEF_ITEMS);
     var OLDN=['珍奶','便當','戲票','鍋物','Switch 遊戲'];
     if(c.items.length===5&&c.items.every(function(it,i){return it&&it.n===OLDN[i];})){c.items.forEach(function(it,i){it.n=ITEM_NAMES[i][1];});}
     return c;}catch(e){return clone(DEF);}}
@@ -407,6 +517,29 @@ function workedSecs(s,t){
 function hms(sec){sec=Math.max(0,Math.floor(sec));return pad(Math.floor(sec/3600))+':'+pad(Math.floor(sec%3600/60))+':'+pad(sec%60);}
 var WKC='日一二三四五六';
 
+/* ---------- overtime (OT) ---------- */
+function dayStart(ds){var p=ds.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function otBase(day){return day.getTime()+(isWorkday(day)?timing().b*1000:0);}
+function otDaySecs(ds,nowMs){
+  var o=cfg.ot,sec=o.log[ds]||0;
+  if(o.since!=null&&ymd(new Date(o.since))===ds){
+    var day=dayStart(ds),from=Math.max(o.since,otBase(day)),cap=Math.min(nowMs,day.getTime()+86400000);
+    if(cap>from)sec+=(cap-from)/1000;
+  }
+  return sec;
+}
+function otCalc(now){
+  var ds=ymd(now),nowMs=now.getTime(),o=cfg.ot,rate=cfg.otPay?(+cfg.otRate||0)/3600:0;
+  var secs=otDaySecs(ds,nowMs);
+  var on=o.since!=null&&ymd(new Date(o.since))===ds;
+  var active=on&&nowMs>=Math.max(o.since,otBase(dayStart(ds)));
+  var pre=ds.slice(0,7),keys={};
+  Object.keys(o.log).forEach(function(k){keys[k]=1;});
+  if(o.since!=null)keys[ymd(new Date(o.since))]=1;
+  var ms=0;Object.keys(keys).forEach(function(k){if(k.slice(0,7)===pre)ms+=otDaySecs(k,nowMs);});
+  return {on:on,active:active,secs:secs,pay:secs*rate,monthPay:ms*rate};
+}
+
 /* ---------- core calculation ---------- */
 function calc(now){
   var y=now.getFullYear(),m=now.getMonth(),td=now.getDate();
@@ -420,8 +553,9 @@ function calc(now){
   var s=now.getHours()*3600+now.getMinutes()*60+now.getSeconds()+now.getMilliseconds()/1000;
   var worked=wd?workedSecs(s,t):0;
   var frac=t.total?worked/t.total:0;
-  var today=daily*frac;
-  var month=before*daily+today;
+  var reg=daily*frac;
+  var O=otCalc(now),today=reg+O.pay;
+  var month=before*daily+reg+O.monthPay;
   var st,msg,chip;
   if(!wd){chip='ANGLE方加';msg='今日方加,玩下HEA下 🎌';st='rest';}
   else if(s<t.a){chip='未開工';msg='飲啖水先,拉下筋準備開工 ☕';st='pre';}
@@ -429,6 +563,7 @@ function calc(now){
   else if(t.ov>0&&s>=t.lo&&s<t.hi){chip='食緊飯';msg='食個靚飯抖一抖先啦 🍱';st='lunch';}
   else{chip='扮工中';st='work';
     msg=frac<.25?'又開始新一日,加油 ☀️':frac<.5?'已經過左1/4,捱住 💪':frac<.75?'過咗半場喇 🚶':'就收工,屌住 🙌';}
+  if(O.active){st='ot';chip='加班中 🔥';msg='加班 '+hms(O.secs)+(cfg.otPay?' · 加班費 '+yen(O.pay,0):' · 冇加班費…');}
   var left=(wd&&s<t.b)?t.b-s:0;
   var today0=new Date(y,m,td),pd=null;
   for(var k=0;k<2&&!pd;k++){
@@ -440,7 +575,7 @@ function calc(now){
   var pdDays=pd?Math.round((pd-today0)/86400000):0;
   var items=cfg.items.filter(function(i){return i&&String(i.n).trim()&&+i.p>0;}).map(function(i){
     return {e:String(i.e||'').trim()||'🎁',n:String(i.n).trim(),p:+i.p,c:Math.floor(today/+i.p)};});
-  return {wd:wd,st:st,chip:chip,msg:msg,today:today,frac:frac,perMin:perMin,perSec:perMin/60,month:month,salary:salary,
+  return {wd:wd,st:st,chip:chip,msg:msg,today:today,frac:frac,perMin:perMin,perSec:O.active?(cfg.otPay?(+cfg.otRate||0)/3600:0):perMin/60,reg:reg,ot:O,month:month,salary:salary,
     monthPct:salary?month/salary*100:0,workdays:total,left:left,pd:pd,pdDays:pdDays,daily:daily,t:t,items:items};
 }
 
@@ -461,17 +596,20 @@ var locked=false;
 /* ---------- home view ---------- */
 var lastInt=-1;
 function render(){
+  otRoll();
+  document.body.setAttribute('data-mode',cfg.mode);
   var st=calc(new Date());
   if(!$('#viewHome').hidden)checkSound(st);
   if(!$('#viewHome').hidden){
     var big=digits(yen(st.today,C().d));var T=$('#today');
     if(T.dataset.v!==big){T.innerHTML=big;T.dataset.v=big;}
     var ip=Math.floor(st.today);
-    if(ip!==lastInt&&lastInt>=0&&st.st==='work'){T.classList.remove('bump');void T.offsetWidth;T.classList.add('bump');}
+    if(ip!==lastInt&&lastInt>=0&&(st.st==='work'||st.st==='ot')){T.classList.remove('bump');void T.offsetWidth;T.classList.add('bump');}
     lastInt=ip;
     dungeon(st);
     $('#stChip').textContent=st.chip;$('#stMsg').textContent=st.msg;
-    $('#perSecTxt').innerHTML=st.st==='work'?'每秒 <b>+'+yen(st.perSec,C().ps)+'</b> 入緊袋':'冇錢袋MOMENT';
+    syncOT(st);
+    $('#perSecTxt').innerHTML=(st.st==='work'||(st.st==='ot'&&cfg.otPay))?'每秒 <b>+'+yen(st.perSec,C().ps)+'</b> 入緊袋':'冇錢袋MOMENT';
     var pc=st.frac*100;
     $('#barFill').style.width=pc+'%';$('#barMk').style.left=pc+'%';
     $('#bar').setAttribute('aria-valuenow',pc.toFixed(0));
@@ -524,6 +662,8 @@ function toast(msg){
 
 /* ---------- dungeon (8-bit sprites) ---------- */
 var SPR={"hero":{"p":{"K":"#1a1423","S":"#f5c9a0","s":"#d9a070","H":"#c9d3e6","h":"#8793b2","A":"#4a6fd0","a":"#2f4a9a","C":"CAPE","c":"CAPEDK","B":"#8a5a2b","G":"#f2d060","W":"#ffffff","E":"#1a1423"},"g":["......KKKKK.....",".....KHHHHHK....","....KHHhhHHHK...","....KHHHHHHHK...","....KHSSSSSSK...","....KHSEESEEK...",".....KSSSSSK....","..KKKKKKKKKK....",".KCCKAAAAAAKK...",".KCCKAAGGAAKSK..",".KcCKAAAAAAKSK..",".KcCKBBBBBBKK...","..KcKAAAAAAK....","...KKAAKKAAK....","....KaaK.KaaK...","...KKKK...KKKK.."]},"sword":{"p":{"K":"#1a1423","W":"#ffffff","L":"#c9d6ea","l":"#8b9cc0","G":"#f2d060","B":"#8a5a2b"},"g":["..KK..",".KWLK.",".KWLK.",".KWLK.",".KWLK.",".KWlK.",".KWlK.",".KWlK.",".KWlK.",".KWlK.",".KWlK.","KKGGKK","KGGGGK",".KBBK.",".KBBK.","..KK.."]},"slime":{"p":{"K":"#1a1423","G":"#4ed36a","g":"#2a9e48","L":"#a8f5b8","W":"#ffffff"},"g":["................","................","................","................",".....KKKKKK.....","....KGGGGGGK....","...KGLLGGGGGK...","..KGLLGGGGGGGK..","..KGGGGGGGGGGK..",".KGGWWGGGWWGGGK.",".KGGWKGGGWKGGGK.",".KGGGGGGGGGGGgK.",".KGGGGKKKKGGGgK.","..KGGGGGGGGGggK.","...KKGggggggKK..",".....KKKKKKKK..."]},"bat":{"p":{"K":"#1a1423","P":"#8a4fd0","p":"#5a2f99","R":"#ff4a4a","W":"#ffffff"},"g":["................",".KK..........KK.",".KPK........KPK.",".KPPK..KK..KPPK.",".KPPPKKPPKKPPPK.",".KPpPPPPPPPPpPK.","..KPpPPPPPPpPK..","..KPPPWRPWRPPK..","...KPPPPPPPPK...","....KPPWPWPK....",".....KPPPPK.....","......KppK......",".......KK.......","................","................","................"]},"skeleton":{"p":{"K":"#1a1423","W":"#f2f0e6","w":"#bdb9a6","R":"#ff4a4a"},"g":[".....KKKKKK.....","....KWWWWWWK....","...KWWWWWWWWK...","...KWKKWWKKWK...","...KWKRWWKRWK...","...KWWWKKWWWK...","....KWWWWWWK....",".....KWKWKWK....","....KKWWWWWKK...","...KWKWKwKWKWK..","....KKWWWWWKK...",".....KWKwKWK....","......KWWWK.....",".....KWK.KWK....","....KKK...KKK...","................"]},"ghost":{"p":{"K":"#1a1423","W":"#f4f7ff","b":"#b9c8ee","B":"#8ea2d8","E":"#1a1423","P":"#ffb3c8"},"g":[".....KKKKKK.....","....KWWWWWWK....","...KWWWWWWWWK...","..KWWWWWWWWWWK..","..KWWEEWWEEWWK..","..KWWEEWWEEWWK..","..KWWWWWWWWWWK..","..KWPWWKKWWPWK..","..KWWWWKKWWWWK..","..KbWWWWWWWWbK..","..KbWWWWWWWWbK..","..KBbWWWWWWbBK..","..KBbWWbbWWbBK..","..KBKbWKKbWKBK..","...K.KBK.KBK.K..","................"]},"goblin":{"p":{"K":"#1a1423","G":"#7ac943","g":"#4e9a2a","Y":"#ffe14a","R":"#c0392b","B":"#8a5a2b","W":"#ffffff"},"g":["................","KK............KK","KGKK.KKKKKK.KKGK",".KGGKKGGGGGKKGK.","..KGGGGGGGGGGK..","..KGGYKGGKYGGK..","..KGGKKGGKKGGK..","..KGGGGGGGGGGK..","...KGRWWWWRGK...","....KKGGGGKK....","...KBBBBBBBBK...","..KGKBBBBBBKGK..","..KGKBBKKBBKGK..","...KKBBK.KBBKK..","....KgK...KgK...","...KKKK...KKKK.."]},"spider":{"p":{"K":"#1a1423","D":"#d9822b","d":"#8f4f14","R":"#ff3b3b","W":"#ffffff"},"g":["................","................","K..K........K..K",".KK.K......K.KK.","...KDK.KK.KDK...","K...KDDDDDDK...K",".KK.KDDDDDDK.KK.","...KDDRDDRDDK...","KKKKDDRDDRDDKKKK","...KDDDWWDDDK...",".KK.KDDDDDDK.KK.","K...KDDddDDK...K","...KKDDDDDDKK...","..KK.KKKKKK.KK..",".KK..........KK.","K..............K"]},"mushroom":{"p":{"K":"#1a1423","R":"#e0453a","r":"#a82a24","W":"#ffffff","T":"#f3dcb0","t":"#c9a878","E":"#1a1423"},"g":["................","......KKKK......","....KKRRRRKK....","...KRRWWRRRRK...","..KRRWWWRRWWRK..","..KRRRWRRRWWRK..",".KRRRRRRRRRRRrK.",".KRWWRRRWWRRRrK.",".KRWWRRRWWRRRrK.",".KrrrrrrrrrrrrK.","..KKKKTTTTKKKK..",".....KTEETTK....",".....KTEETTK....",".....KTTTTtK....","....KKTTTttKK...","....KKKKKKKKK..."]},"snake":{"p":{"K":"#1a1423","G":"#d4a020","g":"#9a7010","Y":"#ffe14a","R":"#ff3b3b","W":"#ffffff"},"g":["................","....KKKK........","...KYYYGK.......","..KGYRGRGK......","..KGGGGGGK......","..KGGWKKGK......","...KKGGGK.......","....KGGGK.......","...KGGgGK.KKK...","..KGGgGGKKGGGK..",".KGGgGGGGGGggGK.",".KGgGGKKGGgGGGK.",".KGGGK..KGGGgK..","..KGGK...KKKK...","...KKK..........","................"]},"dragon":{"p":{"K":"#1a1423","R":"#d9382b","r":"#8f1f1a","O":"#ff8a3a","Y":"#ffe14a","W":"#ffffff","B":"#f3dcb0"},"g":["........................","..KK................KK..",".KRRK..............KRRK.",".KRRRK............KRRRK.","..KRRRKKKKKKKKKKKKRRRK..","...KRRRRRRRRRRRRRRRRK...","....KRRRRRRRRRRRRRRK....","...KRRRYYRRRRRRYYRRRK...","...KRRRYKRRRRRRKYRRRK...","...KRRRRRRRRRRRRRRRRK...","....KRRRRRRKKRRRRRRK....","....KRRRRRRRRRRRRRRK....","...KKRRWRRWRRRWRRWRKK...","..KRRKRRKRRKRRKRRKRRRK..",".KRRRKRRRRRRRRRRRRKRRRK.",".KRRRKOOOOOOOOOOOOKRRRK.",".KRRrKOOOOOOOOOOOOKrRRK.","..KKrKOOOOOOOOOOOOKrKK..","....KKOOOOOOOOOOOOKK....","....KRRKOOOOOOOOKRRK....","....KRRRKKOOOOKKRRRK....","...KRRRRRKKKKKKRRRRRK...","..KBBKKKKK....KKKKBBK...","..KKK............KKK...."]},"demon":{"p":{"K":"#1a1423","P":"#7a3ad0","p":"#4c218f","H":"#f3dcb0","R":"#ff3b3b","Y":"#ffe14a","W":"#ffffff","M":"#c0392b"},"g":["..KK..............KK....",".KHHK............KHHK...",".KHHK............KHHK...",".KHHHK..........KHHHK...","..KHHHKKKKKKKKKKHHHK....","...KKPPPPPPPPPPPPKK.....","....KPPPPPPPPPPPPK......","...KPPYYPPPPPPYYPPK.....","...KPPYRPPPPPPRYPPK.....","...KPPPPPPPPPPPPPPK.....","...KPPPPKKKKKKPPPPK.....","...KPPPKWMWMWMKPPPK.....","....KPPPKKKKKKPPPK......",".....KKPPPPPPPPKK.......","...KKPPKPPPPPPKPPKK.....","..KPPPPKPppppPKPPPPK....",".KPPPPPKPppppPKPPPPPK...",".KPPKKPKPppppPKPKKPPK...",".KKK.KPKPppppPKPK.KKK...","......KPPPppPPPPK.......","......KPPPPPPPPPK.......",".....KPPPK..KPPPK.......",".....KPPPK..KPPPK.......","....KKKKKK..KKKKKK......"]},"kingslime":{"p":{"K":"#1a1423","G":"#4ed36a","g":"#2a9e48","L":"#a8f5b8","W":"#ffffff","Y":"#ffd23a","y":"#c9971a","R":"#ff4a4a","B":"#3a6fe0"},"g":["........................","........................","......K....K....K.......",".....KYK..KYK..KYK......",".....KYYKKYYKKYYK.......",".....KYYYYYYYYYYK.......",".....KYBYYRYYBYYK.......","......KKKKKKKKKK........","........KKKKKK..........","......KKGGGGGGKK........","....KKGGLLGGGGGGKK......","...KGGLLLGGGGGGGGGK.....","..KGGLLGGGGGGGGGGGGK....","..KGGGGGGGGGGGGGGGGK....",".KGGGWWWGGGGGWWWGGGGK...",".KGGGWKKWGGGWKKWGGGGK...",".KGGGWKKWGGGWKKWGGGGgK..",".KGGGGWWGGGGGWWGGGGGgK..",".KGGGGGGGGGGGGGGGGGGgK..",".KGGGGGGKKKKKKGGGGGGgK..","..KGGGGGGKWWWKGGGGGGgK..","..KgGGGGGGKKKGGGGGGggK..","...KKgggggggggggggKKK...",".....KKKKKKKKKKKKKK....."]},"torch1":{"p":{"K":"#1a1423","B":"#8a5a2b","b":"#5e3b1a","R":"#e0453a","O":"#ff8a3a","Y":"#ffe14a","W":"#fff6c0"},"g":["....R...","...ROR..","..RROYR.","..ROYYR.","..ROYWR.","...RYYR.","...KBBK.","...KBbK.","...KBbK.","...KBbK.","...KBbK.","....KK.."]},"torch2":{"p":{"K":"#1a1423","B":"#8a5a2b","b":"#5e3b1a","R":"#e0453a","O":"#ff8a3a","Y":"#ffe14a","W":"#fff6c0"},"g":["........","....R...","...RO...","..ROYR..","..ROYYR.","..ROYWR.","...RYYR.","...KBBK.","...KBbK.","...KBbK.","...KBbK.","....KK.."]},"burst":{"p":{"Y":"#ffe14a","O":"#ff8a3a","R":"#e0453a","W":"#ffffff"},"g":["......Y..Y......",".R....Y..Y....R.","..R...O..O...R..","...O..O..O..O...","....O.YYYY.O....",".....YYWWYYY....","YYOOYYWWWWYYOOYY","....YYWWWWYY....","YYOOYYWWWWYYOOYY",".....YYWWYYY....","....O.YYYY.O....","...O..O..O..O...","..R...O..O...R..",".R....Y..Y....R.","......Y..Y......","................"]},"coin":{"p":{"K":"#1a1423","Y":"#ffd23a","y":"#c9971a","W":"#fff6c0"},"g":["..KKKK..",".KYYYYK.","KYWYYyyK","KYWYyyyK","KYYYyyyK","KYYYyyyK",".KYYyyK.","..KKKK.."]}};
+SPR.flame1={p:{R:'#e0453a',O:'#ff8a3a',Y:'#ffe14a',W:'#fff6c0'},g:["......R.....",".....RR.....","....RRO.R...","...RRORRR...","..RRROORR...","..RROOYORR..",".RROOYYOORR.",".RROYYWYOOR.",".RROYWWYOOR.",".RROYWWYOOR.","..RROYYYORR.","..RRROOORR..","...RRRRRR...","....RRRR...."]};
+SPR.flame2={p:SPR.flame1.p,g:[".......R....","......RR....","...R.RRO....","...RRRORR...","...RROORRR..","..RROYOORR..","..ROOYYOORR.",".RROYYWYOOR.",".RROYWWYOOR.",".RROYWWYOOR.","..RROYYYORR.","..RRROOORR..","...RRRRRR...","....RRRR...."]};
 var CAPE={bear:'#c98a5c',cat:'#e8548b',frog:'#2a9468',shiba:'#c97312',bunny:'#7a68ee',pixel:'#2fb866'};
 var spC={};
 function shadeHex(h,f){var n=parseInt(h.slice(1),16),r=(n>>16)*f,g=((n>>8)&255)*f,b=(n&255)*f;return '#'+[r,g,b].map(function(v){return ('0'+Math.round(v).toString(16)).slice(-2);}).join('');}
@@ -558,6 +698,7 @@ function initDun(){
   st.style.setProperty('--brick','url('+tileURL('brick')+')');st.style.setProperty('--floor','url('+tileURL('floor')+')');
   $('#tcA1').src=$('#tcA2').src=spURL('torch1');$('#tcB1').src=$('#tcB2').src=spURL('torch2');
   $('#swordSp').src=spURL('sword');
+  $$('.fire .fa').forEach(function(i){i.src=spURL('flame1');});$$('.fire .fb').forEach(function(i){i.src=spURL('flame2');});
   $('#heroSp').src=spURL('hero',CAPE[cfg.skin]);
 }
 var MON=['slime','bat','skeleton','ghost','goblin','spider','mushroom','snake'];
@@ -592,13 +733,13 @@ function spark(stg,small){
 }
 function swing(stg){stg.classList.remove('atk');void stg.offsetWidth;stg.classList.add('atk');}
 function dungeon(st){
-  var card=$('#dunCard'),on=cfg.dun;
+  var card=$('#dunCard'),on=cfg.mode==='hero';
   card.hidden=!on;
   if(!on){dK=-1;return;}
   if(!dInit)initDun();
   var L=locate(st.today),k=L.f*9+L.j,prog=L.prog,cur=L.s,n=hitsOf(cur);
   var stg=$('#stage'),mon=$('#mon');
-  stg.setAttribute('data-s',st.st==='work'?'work':'rest');
+  stg.setAttribute('data-s',st.st==='ot'?'ot':st.st==='work'?'work':'rest');
   if(dK<0||k<dK||k-dK>3||document.hidden){
     dK=k;dH=Math.floor(prog*n);
     if(!dBusy){showMon(k);setHp(1-dH/n);}
@@ -632,7 +773,9 @@ function dungeon(st){
     }else if(h<dH){dH=h;setHp(1-dH/n);}
   }
   $('#dunCnt').innerHTML='第 <b>'+(L.f+1)+'</b> 層・'+FLOORS[L.f%FLOORS.length]+'・今日斬咗 <b>'+dK+'</b> 隻';
-  $('#dunSub').textContent=cur.boss?'BOSS 值 '+fm(cur.v)+',打贏佢就發達!頂住!':'呢隻怪值 '+fm(cur.v)+','+['加油斬!','斬佢!','衝呀!','輕輕鬆鬆!'][k%4];
+  var sub=cur.boss?'BOSS 值 '+fm(cur.v)+',打贏佢就發達!頂住!':'呢隻怪值 '+fm(cur.v)+','+['加油斬!','斬佢!','衝呀!','輕輕鬆鬆!'][k%4];
+  if(st.st==='ot')sub=cfg.otPay?'🔥 加班模式!勇者燃燒緊 · '+sub:'🔥 加班冇加班費…勇者靠意志力燃燒緊';
+  $('#dunSub').textContent=sub;
 }
 
 /* ---------- coin sound ---------- */
@@ -661,10 +804,95 @@ function checkSound(st){
   if(!cfg.snd||!(cfg.sndStep>0)){lastMs=-1;return;}
   var k=Math.floor(st.today/cfg.sndStep);
   if(lastMs<0){lastMs=k;return;}
-  if(k>lastMs){if(st.st==='work')coin(cfg.vol/100);lastMs=k;}else if(k<lastMs){lastMs=k;}
+  if(k>lastMs){if(st.st==='work'||st.st==='ot')coin(cfg.vol/100);lastMs=k;}else if(k<lastMs){lastMs=k;}
 }
 function syncSndBtn(){var b=$('#btnSnd');b.setAttribute('aria-pressed',cfg.snd);b.textContent=cfg.snd?'🔔 金錢聲':'🔕 金錢聲';}
 $('#btnSnd').onclick=function(){cfg.snd=!cfg.snd;save();lastMs=-1;syncSndBtn();if(cfg.snd){coin(cfg.vol/100);unlock();}updateSndNote();};
+
+/* ---------- overtime + ledger ---------- */
+function otOnNow(now){return cfg.ot.since!=null&&ymd(new Date(cfg.ot.since))===ymd(now);}
+function otSeal(now){var o=cfg.ot;if(o.since==null)return;var ds=ymd(new Date(o.since));o.log[ds]=Math.round(otDaySecs(ds,now.getTime()));o.since=null;save();}
+function otRoll(){var o=cfg.ot;if(o.since!=null&&ymd(new Date(o.since))!==ymd(new Date()))otSeal(new Date());}
+function syncOT(st){var b=$('#btnOT'),on=st.ot.on;b.setAttribute('aria-pressed',on);b.textContent=on?'💤 結束加班':'🔥 加班';}
+$('#btnOT').onclick=function(){
+  var now=new Date();
+  if(otOnNow(now)){otSeal(now);toast('加班結束,辛苦晒 🙏');}
+  else{otRoll();cfg.ot.since=now.getTime();save();
+    var t=timing();toast((isWorkday(now)&&(now.getHours()*3600+now.getMinutes()*60+now.getSeconds())<t.b)?'收工之後會自動開始計加班 🔥':'加班開始 🔥');}
+  render();
+};
+
+var LGC={e:[['food','🍜','飲食'],['home','🏠','住屋'],['util','💡','水電煤'],['trans','🚃','交通'],['phone','📱','通訊'],['shop','🛍️','購物'],['fun','🎮','娛樂'],['med','💊','醫療'],['edu','📚','學習'],['ins','🛡️','保險/稅'],['gift','🎁','人情/禮物'],['oth','📦','其他']],
+         i:[['sal','💴','薪水'],['bon','🎉','獎金'],['ot','🔥','加班費'],['side','💼','副業'],['oth','📦','其他']]};
+var PIEC=['#e8548b','#f2a33a','#4ba3e0','#2a9468','#8a5ad0','#e0453a','#2ec4b6','#c9971a','#6a7fdb','#d96bb0','#8d6e63','#7f8c8d'];
+var lg={mon:'',all:false,type:'e'};
+function ym(d){return d.getFullYear()+'-'+pad(d.getMonth()+1);}
+function lgM(n){n=Math.round(n*100)/100;return yen(n,Number.isInteger(n)?0:2);}
+function lgCat(t,k){var l=LGC[t];for(var i=0;i<l.length;i++)if(l[i][0]===k)return l[i];return l[l.length-1];}
+function lgFill(){
+  $('#lgCat').innerHTML=LGC[lg.type].map(function(c){return '<option value="'+c[0]+'">'+c[1]+' '+esc(c[2])+'</option>';}).join('');
+  $('#lgTE').setAttribute('aria-pressed',lg.type==='e');$('#lgTI').setAttribute('aria-pressed',lg.type==='i');
+}
+function lgOpen(){
+  lg.mon=ym(new Date());lg.all=false;lg.type='e';
+  var L=cfg.ledger;
+  $('#lgInit').value=L.init||'';$('#lgDate').value=ymd(new Date());$('#lgAmt').value='';$('#lgNote').value='';
+  $('#lgAmtLbl').textContent='金額('+C().s+')';$('#lgInitLbl').textContent='期初資產('+C().s+',你而家有幾多錢)';
+  lgFill();lgRender();
+}
+function lgRender(){
+  var L=cfg.ledger,all=L.items,I=0,E=0;
+  all.forEach(function(x){if(x.t==='i')I+=x.a;else E+=x.a;});
+  var net=L.init+I-E;
+  var nb=$('#lgNet');nb.textContent=(net<0?'-':'')+lgM(Math.abs(net));nb.classList.toggle('neg',net<0);
+  $('#lgNetSub').textContent='期初 '+lgM(L.init)+' + 收入 '+lgM(I)+' − 支出 '+lgM(E);
+  var sel=lg.all?all:all.filter(function(x){return x.d.slice(0,7)===lg.mon;});
+  $('#lgMonT').textContent=lg.all?'全部記錄':lg.mon.slice(0,4)+' 年 '+(+lg.mon.slice(5,7))+' 月';
+  $('#lgPrev').hidden=$('#lgNext').hidden=lg.all;$('#lgAll').setAttribute('aria-pressed',lg.all);$('#lgAll').textContent=lg.all?'分月睇':'全部';
+  var si=0,se=0,by={};
+  sel.forEach(function(x){if(x.t==='i')si+=x.a;else{se+=x.a;by[x.c]=(by[x.c]||0)+x.a;}});
+  $('#lgSum').innerHTML='<span>收入<b class="amt">'+lgM(si)+'</b></span><span>支出<b class="amt">'+lgM(se)+'</b></span><span>結餘<b class="amt">'+(si-se<0?'-':'')+lgM(Math.abs(si-se))+'</b></span>';
+  var ks=Object.keys(by).sort(function(a,b){return by[b]-by[a];});
+  if(!ks.length){
+    $('#lgPie').innerHTML='';$('#lgLegend').innerHTML='<div class="empty">'+(lg.all?'未有支出記錄':'呢個月未有支出記錄')+',喺上面記一筆啦。</div>';
+  }else{
+    var svg='<svg class="pie amt" viewBox="0 0 42 42" role="img" aria-label="支出比例圓餅圖"><circle cx="21" cy="21" r="15.915" fill="none" stroke="var(--track)" stroke-width="6"/>',cum=0,lh='';
+    ks.forEach(function(k,i){
+      var p=by[k]/se*100,col=PIEC[i%PIEC.length],c=lgCat('e',k),gap=p>1?0.5:0;
+      svg+='<circle cx="21" cy="21" r="15.915" fill="none" stroke="'+col+'" stroke-width="6" stroke-dasharray="'+(p-gap).toFixed(3)+' '+(100-p+gap).toFixed(3)+'" stroke-dashoffset="'+(25-cum).toFixed(3)+'"/>';
+      cum+=p;
+      lh+='<div class="lgrow"><i style="background:'+col+'"></i><span>'+c[1]+' '+esc(c[2])+'</span><b class="amt">'+lgM(by[k])+'</b><em>'+(p<1?'<1':Math.round(p))+'%</em></div>';
+    });
+    svg+='<text x="21" y="20" font-size="3.2" style="fill:var(--muted)">支出</text><text x="21" y="25.2" font-size="4">'+esc(lgM(se))+'</text></svg>';
+    $('#lgPie').innerHTML=svg;$('#lgLegend').innerHTML=lh;
+  }
+  var rows=sel.slice().sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:b.id-a.id;}).slice(0,200),h='';
+  rows.forEach(function(x){
+    var c=lgCat(x.t,x.c);
+    h+='<div class="lrow"><span class="ld">'+(+x.d.slice(5,7))+'/'+(+x.d.slice(8,10))+'</span><span>'+c[1]+'</span><span class="ln">'+esc(c[2])+(x.n?' · '+esc(x.n):'')+'</span><b class="lamt amt '+x.t+'">'+(x.t==='i'?'+':'−')+lgM(x.a)+'</b><button type="button" class="x" data-lgdel="'+x.id+'" aria-label="刪除">✕</button></div>';
+  });
+  $('#lgList').innerHTML=h||'<div class="empty">未有記錄。</div>';
+}
+$('#lgTE').onclick=function(){lg.type='e';lgFill();};
+$('#lgTI').onclick=function(){lg.type='i';lgFill();};
+$('#lgPrev').onclick=function(){var p=lg.mon.split('-');lg.mon=ym(new Date(+p[0],+p[1]-2,1));lgRender();};
+$('#lgNext').onclick=function(){var p=lg.mon.split('-');lg.mon=ym(new Date(+p[0],+p[1],1));lgRender();};
+$('#lgAll').onclick=function(){lg.all=!lg.all;lgRender();};
+$('#lgInit').addEventListener('input',function(){cfg.ledger.init=parseFloat(this.value)||0;save();lgRender();});
+$('#lgAdd').onclick=function(){
+  var a=parseFloat($('#lgAmt').value);
+  if(!(a>0)){toast('請輸入大過 0 嘅金額');$('#lgAmt').focus();return;}
+  var d=$('#lgDate').value||ymd(new Date());
+  cfg.ledger.items.push({id:Date.now()+Math.floor(Math.random()*1000),t:lg.type,a:Math.round(a*100)/100,c:$('#lgCat').value,d:d,n:$('#lgNote').value.trim()});
+  save();$('#lgAmt').value='';$('#lgNote').value='';
+  if(!lg.all)lg.mon=d.slice(0,7);
+  toast('已記低 ✅');lgRender();
+};
+$('#lgList').addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('[data-lgdel]');if(!b)return;
+  var id=+b.getAttribute('data-lgdel');
+  cfg.ledger.items=cfg.ledger.items.filter(function(x){return x.id!==id;});save();lgRender();
+});
 
 /* ---------- lock ---------- */
 $('#btnLock').onclick=function(){locked=!locked;document.body.classList.toggle('locked',locked);
@@ -675,7 +903,7 @@ var daysBox=$('#days');
 '日一二三四五六'.split('').forEach(function(c,i){
   var l=document.createElement('label');l.innerHTML='<input type="checkbox" value="'+i+'"> '+c;daysBox.appendChild(l);});
 function fillForm(){
-  $('#cur').value=cfg.cur;$('#snd').checked=cfg.snd;$('#sndStep').value=cfg.sndStep;$('#vol').value=cfg.vol;$('#dun').checked=cfg.dun;
+  $('#cur').value=cfg.cur;$('#snd').checked=cfg.snd;$('#sndStep').value=cfg.sndStep;$('#vol').value=cfg.vol;$('#mode').value=cfg.mode;$('#otPay').checked=cfg.otPay;$('#otRate').value=cfg.otRate;$('#otRate').disabled=!cfg.otPay;
   $('#salary').value=cfg.salary;$('#rate').value=cfg.rate;$('#start').value=cfg.start;$('#end').value=cfg.end;
   $('#ls').value=cfg.ls;$('#le').value=cfg.le;$('#payday').value=cfg.payday;$('#jp').checked=cfg.jp;$('#early').checked=cfg.early;
   $$('input',daysBox).forEach(function(c){c.checked=cfg.days.indexOf(+c.value)>=0;});
@@ -695,6 +923,7 @@ function fmtMin(m){return m<1?Math.max(1,Math.round(m*60))+' 秒':(m<10?m.toFixe
 function summary(){
   var st=calc(new Date());
   $('#sndHint2').textContent=st.perMin>0?'以而家嘅人工,大約每 '+fmtMin(cfg.sndStep/st.perMin)+' 響一次':'';
+  $('#otHint').textContent=cfg.otPay&&cfg.otRate>0?'加班每分鐘 '+yen(cfg.otRate/60,2)+',每秒 '+yen(cfg.otRate/3600,3):'';
   $('#sum').innerHTML='<span>日薪<b>'+yen(st.daily,0)+'</b></span><span>每分鐘<b>'+yen(st.perMin,2)+'</b></span><span>每秒<b>'+yen(st.perSec,C().ps)+'</b></span><span>今個月工作日<b>'+st.workdays+' 日</b></span>';
 }
 var curSel=$('#cur');
@@ -705,6 +934,7 @@ function applyCurUI(){
   $('#subT').textContent='按'+c.n+'計・每一秒都有錢落袋';
   var base=SND[cfg.cur]||100;
   $('#sndPresets').innerHTML=[1,5,10,50].map(function(x){return '<button type="button" class="pill" data-preset="'+(base*x)+'">'+esc(yen(base*x,0))+'</button>';}).join('');
+  $('#otLbl').textContent='加班時薪('+c.s+')';
   $('#sndLbl').textContent='每賺到幾多('+c.s+')響一次';
   drawTpls();
 }
@@ -716,13 +946,14 @@ function readForm(){
     else{toast('你自訂嘅物品價錢冇自動轉換,請自己檢查');}
     if(+$('#salary').value===CUR[old].sal){$('#salary').value=CUR[nc].sal;}
     if(+$('#sndStep').value===SND[old]){$('#sndStep').value=SND[nc];}
+    if(+$('#otRate').value===OTR[old]){$('#otRate').value=OTR[nc];}
     cfg.cur=nc;drawItems();applyCurUI();
   }
   var n=function(id,d,lo,hi){var v=parseFloat($(id).value);if(!isFinite(v))return d;return Math.min(hi,Math.max(lo,v));};
   cfg.salary=n('#salary',DEF.salary,0,100000000);cfg.rate=n('#rate',100,1,100);cfg.payday=Math.round(n('#payday',25,1,31));
   cfg.start=$('#start').value||DEF.start;cfg.end=$('#end').value||DEF.end;cfg.ls=$('#ls').value||DEF.ls;cfg.le=$('#le').value||DEF.le;
   cfg.jp=$('#jp').checked;cfg.early=$('#early').checked;
-  cfg.snd=$('#snd').checked;cfg.sndStep=n('#sndStep',SND[cfg.cur]||100,0.01,1e9);cfg.vol=n('#vol',60,0,100);cfg.dun=$('#dun').checked;dK=-1;lastMs=-1;syncSndBtn();updateSndNote();
+  cfg.snd=$('#snd').checked;cfg.sndStep=n('#sndStep',SND[cfg.cur]||100,0.01,1e9);cfg.vol=n('#vol',60,0,100);cfg.mode=$('#mode').value==='ticker'?'ticker':'hero';cfg.otPay=$('#otPay').checked;cfg.otRate=n('#otRate',OTR[cfg.cur]||2000,0,1e9);$('#otRate').disabled=!cfg.otPay;dK=-1;lastMs=-1;syncSndBtn();updateSndNote();
   cfg.days=$$('input',daysBox).filter(function(c){return c.checked;}).map(function(c){return +c.value;});
   var w=[];
   if(toSec(cfg.end)<=toSec(cfg.start))w.push('放工時間要遲過上班時間,暫時用返預設 9:00–18:00 計。');
@@ -756,8 +987,9 @@ $('#resetItems').onclick=function(){cfg.items=clone(DEF_ITEMS);save();drawItems(
 
 /* ---------- view switching ---------- */
 function showView(name){
-  var setup=name==='setup';
-  $('#viewSetup').hidden=!setup;$('#viewHome').hidden=setup;
+  var setup=name==='setup',led=name==='ledger';
+  $('#viewSetup').hidden=!setup;$('#viewHome').hidden=(setup||led);$('#viewLedger').hidden=!led;
+  if(led)lgOpen();
   if(setup){
     fillForm();
     $('#btnBack').hidden=!cfg.done;
@@ -769,6 +1001,8 @@ function showView(name){
 $('#btnStart').onclick=function(){readForm();if(!cfg.days.length)return;cfg.done=true;save();showView('home');};
 $('#btnBack').onclick=function(){showView('home');};
 $('#btnSet').onclick=function(){showView('setup');};
+$('#btnLedger').onclick=function(){showView('ledger');};
+$('#btnLgBack').onclick=function(){showView('home');};
 
 /* ---------- boot ---------- */
 applySkin();applyCurUI();syncSndBtn();updateSndNote();
