@@ -4,13 +4,19 @@
 <style>
 /* Layout: two views (setup page first, then the ticking dashboard). Each skin re-themes the whole page: palette, radii, fonts. */
 :root{
-  --bg:#f8ecdc; --bg2:#f2dfc8; --card:#fffaf3; --ink:#5a3d2b; --muted:#8c6d57;
-  --accent:#c98a5c; --accent-ink:#ffffff; --soft:#f6e6d4; --track:#f1e1cf; --line:#ecd9c3;
-  --shadow:0 3px 0 #e6cfb4, 0 10px 24px rgba(120,80,40,.10);
-  --rc:22px; --rp:999px; --rs:14px;
-  --num:'Fredoka','Noto Sans TC',sans-serif;
-  --ui:'Noto Sans TC','Hiragino Sans','Yu Gothic',system-ui,sans-serif;
+  --bg:#121a36; --bg2:#0c1229; --card:#1b2547; --ink:#7dff9b; --muted:#6fbf86;
+  --accent:#7dff9b; --accent-ink:#0c1229; --soft:#2c3a6b; --track:#2c3a6b; --line:#3a4a85;
+  --shadow:4px 4px 0 #080d1f;
+  --rc:0px; --rp:0px; --rs:0px;
+  --num:'DotGothic16','Noto Sans TC',monospace;
+  --ui:'DotGothic16','Noto Sans TC',monospace;
+  color-scheme:dark;
 }
+.card{border:3px solid var(--line)}
+.warn{color:#ff9d86!important}
+.net .big2.neg{color:#ff9d86!important}
+.lrow .lamt.i{color:#ffe14a!important}
+
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -177,7 +183,7 @@ body[data-mode="ticker"] #dunCard{display:none}
 .net .big2.neg{color:#c2452d}
 .net .s{color:var(--muted);font-size:12.5px}
 .seg{display:flex;gap:8px}
-input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--rs);padding:8px 10px;width:100%;min-width:0}
+input[type=date],input[type=month]{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:var(--rs);padding:8px 10px;width:100%;min-width:0}
 .lgmon{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .lgmon b{font-family:var(--num);font-size:16px;min-width:110px;text-align:center}
 .lgsum{display:flex;gap:6px 18px;flex-wrap:wrap;margin-top:10px}
@@ -668,9 +674,9 @@ function render(){
 
 /* ---------- look (one fixed design) ---------- */
 function applySkin(){
-  document.body.setAttribute('data-skin','bear');
-  document.documentElement.style.background='#f2dfc8';
-  document.documentElement.style.colorScheme='light';
+  document.body.setAttribute('data-skin','pixel');
+  document.documentElement.style.background='#0c1229';
+  document.documentElement.style.colorScheme='dark';
   var hu=spURL('head');
   $$('[data-logo]').forEach(function(n){n.src=hu;});
   $('#barMk').src=spURL('sword');
