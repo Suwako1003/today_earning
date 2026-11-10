@@ -11,13 +11,6 @@
   --num:'Fredoka','Noto Sans TC',sans-serif;
   --ui:'Noto Sans TC','Hiragino Sans','Yu Gothic',system-ui,sans-serif;
 }
-body[data-skin="cat"]{--bg:#ffeef4;--bg2:#ffdce9;--card:#fff8fb;--ink:#6b3a4e;--muted:#a0657f;--accent:#e8548b;--accent-ink:#fff;--soft:#fde0eb;--track:#fcd9e6;--line:#f8c9db;--shadow:0 3px 0 #f6c1d5,0 10px 24px rgba(200,80,120,.12)}
-body[data-skin="frog"]{--bg:#e6f8ee;--bg2:#d3f0e1;--card:#f6fffa;--ink:#1f5a43;--muted:#4f8a72;--accent:#2a9468;--accent-ink:#fff;--soft:#d5f3e4;--track:#cdeedd;--line:#bfe7d3;--shadow:0 3px 0 #b5e0ca,0 10px 24px rgba(40,140,100,.12)}
-body[data-skin="shiba"]{--bg:#fff0d6;--bg2:#fbe2b6;--card:#fffaf0;--ink:#6a4310;--muted:#9a722f;--accent:#c97312;--accent-ink:#fff;--soft:#fde9c8;--track:#fbe3bd;--line:#f5d49c;--shadow:0 3px 0 #f0cb8d,0 10px 24px rgba(180,110,20,.12)}
-body[data-skin="bunny"]{--bg:#2a2460;--bg2:#1c1845;--card:#3a3380;--ink:#f1edff;--muted:#b9b0e8;--accent:#b7a6ff;--accent-ink:#231a5e;--soft:#4a4290;--track:#4a4290;--line:#5b52a8;--shadow:0 3px 0 #15123a,0 10px 24px rgba(0,0,0,.35);color-scheme:dark}
-body[data-skin="pixel"]{--bg:#121a36;--bg2:#0c1229;--card:#1b2547;--ink:#7dff9b;--muted:#6fbf86;--accent:#7dff9b;--accent-ink:#0c1229;--soft:#2c3a6b;--track:#2c3a6b;--line:#3a4a85;--shadow:4px 4px 0 #080d1f;--rc:0px;--rp:0px;--rs:0px;
-  --ui:'DotGothic16','Noto Sans TC',monospace;--num:'DotGothic16',monospace;color-scheme:dark}
-body[data-skin="pixel"] .card{border:3px solid var(--line)}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -30,7 +23,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
-.brand .logo{font-size:44px;line-height:1}
+.brand .logo{width:44px;height:32px;display:block;image-rendering:pixelated}
 .brand h1{margin:0;font-size:24px;line-height:1.2;font-weight:700;letter-spacing:.02em}
 .brand p{margin:0;color:var(--muted);font-size:12.5px}
 nav{display:flex;gap:8px;flex-wrap:wrap}
@@ -53,7 +46,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap}
 .rate b{color:var(--accent);font-family:var(--num);font-weight:600}
 .bar{position:relative;height:14px;border-radius:var(--rp);background:var(--track);margin:18px 0 6px}
 .bar>i{position:absolute;inset:0 auto 0 0;width:0;border-radius:var(--rp);background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 70%,#fff))}
-.bar>.mk{position:absolute;top:50%;left:0;transform:translate(-50%,-62%);font-size:28px;line-height:1;filter:drop-shadow(0 2px 0 rgba(0,0,0,.12))}
+.bar>.mk{position:absolute;top:50%;left:0;width:12px;height:32px;transform:translate(-50%,-50%) rotate(90deg);image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.18))}
 .barlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
 .barlbl b{color:var(--accent);font-weight:600}
 
@@ -75,12 +68,6 @@ nav{display:flex;gap:8px;flex-wrap:wrap}
 
 .sec h2{margin:0 0 2px;font-size:16px}
 .sec .sub{margin:0 0 14px;color:var(--muted);font-size:12.5px}
-.tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px}
-.tpl{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:2px solid transparent;border-radius:var(--rs);padding:12px;background:var(--f-bg);color:var(--f-ink);font-family:var(--f-font,var(--ui));box-shadow:0 0 0 1px rgba(0,0,0,.08)}
-.tpl .e{font-size:26px;line-height:1.1}
-.tpl .n{font-size:12.5px;font-weight:700}
-.tpl .a{font-family:var(--num);font-weight:700;font-size:15px;color:var(--f-accent)}
-.tpl[aria-checked="true"]{border-color:var(--f-ink);box-shadow:0 0 0 3px var(--accent)}
 
 .set{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 18px}
 .f{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -92,7 +79,6 @@ input[type=number],input[type=time],input[type=text],select{font:inherit;color:v
 .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink)}
 .full{grid-column:1/-1}
 .warn{color:#c2452d;font-size:12.5px;font-weight:500}
-body[data-skin="bunny"] .warn,body[data-skin="pixel"] .warn{color:#ff9d86}
 .irows{display:flex;flex-direction:column;gap:8px}
 .irow{display:grid;grid-template-columns:64px minmax(0,1fr) 128px 36px;gap:8px;align-items:center}
 .irow .ie{text-align:center;font-size:20px;padding:6px}
@@ -161,11 +147,6 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 @media (prefers-reduced-motion:reduce){.stage *,.stage{animation:none!important}}
 
 [data-skin="bear"]{--f-bg:#fffaf3;--f-tail:#fffaf3;--f-ink:#5a3d2b;--f-sub:#8c6d57;--f-accent:#c98a5c;--f-track:#f1e1cf;--f-border:#c98a5c;--f-chip:#f6e6d4;--f-chipink:#8a5a38}
-[data-skin="cat"]{--f-bg:#fff1f6;--f-tail:#fff1f6;--f-ink:#6b3a4e;--f-sub:#a0657f;--f-accent:#f06c9b;--f-track:#fcd9e6;--f-border:#f4a1c0;--f-chip:#fde0eb;--f-chipink:#c2457a}
-[data-skin="frog"]{--f-bg:#ecfaf2;--f-tail:#ecfaf2;--f-ink:#1f5a43;--f-sub:#4f8a72;--f-accent:#3fb27f;--f-track:#cdeedd;--f-border:#7fd1aa;--f-chip:#d5f3e4;--f-chipink:#23805a}
-[data-skin="shiba"]{--f-bg:#fff5e4;--f-tail:#fff5e4;--f-ink:#6a4310;--f-sub:#9a722f;--f-accent:#f2a03d;--f-track:#fbe3bd;--f-border:#f5bd6d;--f-chip:#fde9c8;--f-chipink:#b0661a}
-[data-skin="bunny"]{--f-bg:linear-gradient(160deg,#4d4290,#2d2762);--f-tail:#322b6c;--f-ink:#f1edff;--f-sub:#b9b0e8;--f-accent:#b7a6ff;--f-track:#4a4290;--f-border:#8272d8;--f-chip:rgba(255,255,255,.15);--f-chipink:#e2dbff}
-[data-skin="pixel"]{--f-bg:#1b2547;--f-tail:#1b2547;--f-ink:#7dff9b;--f-sub:#6fbf86;--f-accent:#7dff9b;--f-track:#2c3a6b;--f-border:#7dff9b;--f-chip:#2c3a6b;--f-chipink:#7dff9b;--f-font:'DotGothic16','Noto Sans TC',monospace;--f-num:'DotGothic16',monospace;--f-r:0px}
 
 
 @media (max-width:720px){
@@ -274,7 +255,7 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
   <div class="view" id="viewSetup" hidden>
     <header>
       <div class="brand">
-        <div class="logo" data-logo aria-hidden="true">🧸</div>
+        <img class="logo" data-logo alt="" aria-hidden="true">
         <div>
           <h1 id="setH">先設定一下人工</h1>
           <p>幾個基本資料,之後就可以睇住錢跳。全部只存喺你呢部機嘅瀏覽器入面。</p>
@@ -351,12 +332,6 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
       </div>
     </section>
 
-    <section class="card sec">
-      <h2>🎨 造型</h2>
-      <p class="sub">揀咗之後,成個介面會一齊換。</p>
-      <div class="tpls" role="radiogroup" aria-label="造型"></div>
-    </section>
-
     <section class="card sum" id="sum" aria-live="polite"></section>
 
     <div class="cta"><button class="pill primary lg" id="btnStart" type="button">開始賺錢 ✨</button></div>
@@ -366,7 +341,7 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
   <div class="view" id="viewHome" hidden>
     <header>
       <div class="brand">
-        <div class="logo" data-logo aria-hidden="true">🧸</div>
+        <img class="logo" data-logo alt="" aria-hidden="true">
         <div>
           <h1>人生online之地下城歷險</h1>
           <p id="subT">按日圓計・每一秒都有錢落袋</p>
@@ -403,7 +378,7 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
       <div class="big amt tick-only" id="today" aria-live="off">¥0.00</div>
       <div class="rate tick-only" id="perSecTxt"></div>
       <div class="bar" role="progressbar" aria-label="今日進度" aria-valuemin="0" aria-valuemax="100" id="bar">
-        <i id="barFill"></i><span class="mk" id="barMk" aria-hidden="true">🧸</span>
+        <i id="barFill"></i><img class="mk" id="barMk" alt="" aria-hidden="true">
       </div>
       <div class="barlbl"><span id="tStart">09:00</span><b id="pct">0%</b><span id="tEnd">18:00</span></div>
     </section>
@@ -438,11 +413,6 @@ input[type=date]{font:inherit;color:var(--ink);background:var(--bg);border:2px s
       <div id="itemList" style="display:contents"></div>
     </section>
 
-    <section class="card sec">
-      <h2>🎨 造型</h2>
-      <p class="sub">揀一個鍾意嘅造型,成個介面會一齊換。</p>
-      <div class="tpls" role="radiogroup" aria-label="造型"></div>
-    </section>
   </div>
   <div class="view" id="viewLedger" hidden>
     <header>
@@ -657,12 +627,6 @@ function digits(str){return str.replace(/[0-9]/g,function(c){return '<span class
 function pdText(st){var d=st.pd;return d?(d.getMonth()+1)+'月'+d.getDate()+'日(星期'+WKC[d.getDay()]+')':'';}
 function hm(sec){return pad(Math.floor(sec/3600))+':'+pad(Math.floor(sec%3600/60));}
 
-/* ---------- skins ---------- */
-var SKINS={
-  bear:{n:'啡啤啤',e:'🧸',bg:'#fffaf3',page:'#f2dfc8',dark:false},cat:{n:'粉紅貓貓',e:'🐱',bg:'#fff1f6',page:'#ffdce9',dark:false},
-  frog:{n:'抹茶龜龜',e:'🐢',bg:'#ecfaf2',page:'#d3f0e1',dark:false},shiba:{n:'狗狗',e:'🐶',bg:'#fff5e4',page:'#fbe2b6',dark:false},
-  bunny:{n:'紫色兔兔',e:'🐰',bg:'#2d2762',page:'#1c1845',dark:true},pixel:{n:'8-BIT',e:'👾',bg:'#1b2547',page:'#0c1229',dark:true}};
-
 var locked=false;
 
 /* ---------- home view ---------- */
@@ -702,27 +666,15 @@ function render(){
   }
 }
 
-/* ---------- skin (whole interface) ---------- */
-function drawTpls(){
-  $$('.tpls').forEach(function(box){
-    box.innerHTML='';
-    Object.keys(SKINS).forEach(function(k){
-      var b=document.createElement('button');b.type='button';b.className='tpl';b.setAttribute('data-skin',k);
-      b.setAttribute('role','radio');b.setAttribute('aria-checked',cfg.skin===k?'true':'false');
-      b.innerHTML='<span class="e">'+SKINS[k].e+'</span><span class="n">'+SKINS[k].n+'</span><span class="a">'+esc(C().s)+'1,234</span>';
-      b.onclick=function(){cfg.skin=k;save();applySkin();};
-      box.appendChild(b);
-    });
-  });
-}
+/* ---------- look (one fixed design) ---------- */
 function applySkin(){
-  var S=SKINS[cfg.skin];
-  document.body.setAttribute('data-skin',cfg.skin);
-  document.documentElement.style.background=S.page;
-  document.documentElement.style.colorScheme=S.dark?'dark':'light';
-  drawTpls();
-  $$('[data-logo]').forEach(function(n){n.textContent=S.e;});
-  $('#barMk').textContent=S.e;if(dInit)$('#heroSp').src=spURL('hero',CAPE[cfg.skin]);
+  document.body.setAttribute('data-skin','bear');
+  document.documentElement.style.background='#f2dfc8';
+  document.documentElement.style.colorScheme='light';
+  var hu=spURL('head');
+  $$('[data-logo]').forEach(function(n){n.src=hu;});
+  $('#barMk').src=spURL('sword');
+  if(dInit)$('#heroSp').src=spURL('hero',CAPE);
 }
 
 /* ---------- toast ---------- */
@@ -737,7 +689,8 @@ var SPR={"hero":{"p":{"K":"#1a1423","S":"#f5c9a0","s":"#d9a070","H":"#c9d3e6","h
 SPR.flame1={p:{R:'#e0453a',O:'#ff8a3a',Y:'#ffe14a',W:'#fff6c0'},g:["......R.....",".....RR.....","....RRO.R...","...RRORRR...","..RRROORR...","..RROOYORR..",".RROOYYOORR.",".RROYYWYOOR.",".RROYWWYOOR.",".RROYWWYOOR.","..RROYYYORR.","..RRROOORR..","...RRRRRR...","....RRRR...."]};
 SPR.flame2={p:SPR.flame1.p,g:[".......R....","......RR....","...R.RRO....","...RRRORR...","...RROORRR..","..RROYOORR..","..ROOYYOORR.",".RROYYWYOOR.",".RROYWWYOOR.",".RROYWWYOOR.","..RROYYYORR.","..RRROOORR..","...RRRRRR...","....RRRR...."]};
 Object.assign(SPR,{"pine":{"p":{"K":"#0d1b16","G":"#2e6b49","g":"#3f8a5c","d":"#245640","T":"#5e3b1a"},"g":["........KKK........",".......KGGGK.......",".......KGGGK.......","......KGGGGGK......","......KGGGGGK......",".....KGgGGGdGK.....",".....KgGGGGGGK.....","....KgGGGGGGGdK....","....KGGgGGGGdGK....",".....KgGGGGdGK.....","....KgGGGGGGGGK....","....KGGgGGGGGdK....","...KGGgGGGGGdGGK...","...KGgGGGGGdGGGK...","..KGgGGgGGGGGGdGK..","...KKKgGGGGGGKKK...","....KgGGGGGGdGK....","...KgGGgGGGdGGGK...","..KgGGgGGGGGGGdGK..","..KGGgGGGGGGGdGGK..",".KGGgGGgGGGGdGGGdK.","KGGgGGgGGGGdGGGdGGK",".KKKKKKKTTTKKKKKKK.",".......KTTTK.......",".......KTTTK.......","........KKK........"]},"tent":{"p":{"K":"#1a1423","O":"#f0a43a","o":"#d9822b","Y":"#fff0b0","y":"#f2c060","D":"#3a2412","R":"#e0453a","s":"#1c3b2d"},"g":["............KRRK..........","...........KOooK..........","..........KOYoooK.........",".........KOYOooooK........","........KOYOOooooyK.......","........KYOODDDoyoK.......",".......KYOOODDDyoooK......","......KYOOODDDDDooooK.....",".....KYOOOODDDDDooooyK....","....KYOOOODDDDDDDooyooK...","...KYOOOOODDDDDDDoyooooK..","..KYOOOOODDDDDDDDDooooooK.",".KYOOOOOODDDDDDDDDoooooyoK","KYOOOOOODDDDDDDDDDDoooyooo","KOOOOOODDDDDDDDDDDDDoyoooo",".KssssssssssssssssssssssKK","..KKKKKKKKKKKKKKKKKKKKKK.."]},"logs":{"p":{"K":"#1a1423","B":"#8a5a2b","b":"#5e3b1a"},"g":["...KBBBBBBBBK...","..KBbBBBBBBbBK..",".KBBBbbBBbbBBBK.","KBbBBBBKKBBBBbBK",".KKKKKKKKKKKKKK."]},"onigiri":{"p":{"K":"#1a1423","W":"#ffffff","N":"#1f3a2a"},"g":["....K....","...KWK...","..KWWWK..",".KWWWWWK.",".KWWWWWK.","KWWNNNWWK","KWNNNNNWK",".KKKKKKK."]},"moon":{"p":{"K":"#1a1423","Y":"#fff2b0"},"g":["..KKKK..",".KYYYK..","KYYYK...","KYYK....","KYYK....","KYYYK...",".KYYYKK.","..KKKKK."]}});
-var CAPE={bear:'#c98a5c',cat:'#e8548b',frog:'#2a9468',shiba:'#c97312',bunny:'#7a68ee',pixel:'#2fb866'};
+SPR.head={p:SPR.hero.p,g:["...KKKKK...","..KHHHHHK..",".KHHhhHHHK.",".KHHHHHHHK.",".KHSSSSSSK.",".KHSEESEEK.","..KSSSSSK..","...KKKKK..."]};
+var CAPE='#d9473a';
 var spC={};
 function shadeHex(h,f){var n=parseInt(h.slice(1),16),r=(n>>16)*f,g=((n>>8)&255)*f,b=(n&255)*f;return '#'+[r,g,b].map(function(v){return ('0'+Math.round(v).toString(16)).slice(-2);}).join('');}
 function spURL(k,cape){
@@ -793,7 +746,7 @@ function initDun(){
 
 
   $$('.fire .fa').forEach(function(i){i.src=spURL('flame1');});$$('.fire .fb').forEach(function(i){i.src=spURL('flame2');});
-  $('#heroSp').src=spURL('hero',CAPE[cfg.skin]);
+  $('#heroSp').src=spURL('hero',CAPE);
 }
 var MON=['slime','bat','skeleton','ghost','goblin','spider','mushroom','snake'];
 var BOSS=['dragon','demon','kingslime'];
@@ -1043,7 +996,6 @@ function applyCurUI(){
   $('#sndPresets').innerHTML=[1,5,10,50].map(function(x){return '<button type="button" class="pill" data-preset="'+(base*x)+'">'+esc(yen(base*x,0))+'</button>';}).join('');
   $('#otLbl').textContent='加班時薪('+c.s+')';
   $('#sndLbl').textContent='每賺到幾多('+c.s+')響一次';
-  drawTpls();
 }
 function readForm(){
   var nc=$('#cur').value;
