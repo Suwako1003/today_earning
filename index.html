@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><title>人生online之地下城歷險</title>
+<!doctype html><html lang="zh-HK"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>人生online之地下城歷險</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
@@ -165,9 +165,31 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   .bump{animation:none}
 }
 
+
+/* ---- driving modes ---- */
+.dview{position:relative;aspect-ratio:240/128;border:4px solid #1a1423;box-shadow:0 0 0 2px var(--line);background:#000;overflow:hidden;user-select:none}
+.dview canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+.dview::after{content:'';position:absolute;inset:0;pointer-events:none}
+.dview[data-s="ot"]::after{box-shadow:inset 0 0 54px rgba(255,80,30,.6)}
+.dhud{position:absolute;font:700 clamp(10px,2.3vw,14px)/1.25 'DotGothic16',var(--num),monospace;color:#fff;background:rgba(8,13,31,.75);border:2px solid #1a1423;padding:2px 7px;white-space:nowrap;pointer-events:none}
+.dhud.tl{left:2.5%;top:9%}.dhud.tr{right:2.5%;top:9%;color:#ffe14a}.dhud:empty{display:none}
+.dmeter{position:absolute;left:3%;bottom:3.5%;background:#07140c;border:2px solid #2a3152;padding:2px 8px 3px;min-width:33%;pointer-events:none}
+.dmeter span{display:block;font-size:clamp(8px,1.7vw,11px);color:#6fbf86;line-height:1.15}
+.dmeter b{display:block;font:700 clamp(15px,3.9vw,26px)/1.1 'DotGothic16',var(--num),monospace;color:#ff5a4a;text-shadow:0 0 6px rgba(255,90,74,.55);letter-spacing:1px;white-space:nowrap}
+.dview.del .dmeter b{color:#7dff9b;text-shadow:0 0 6px rgba(125,255,155,.5)}
+.dtotal{position:absolute;right:3%;bottom:3.5%;text-align:right;background:rgba(8,13,31,.75);border:2px solid #2a3152;padding:2px 8px 3px;pointer-events:none}
+.dtotal span{display:block;font-size:clamp(8px,1.7vw,11px);color:#6fbf86;line-height:1.15}
+.dtotal b{display:block;font:700 clamp(11px,2.7vw,17px)/1.15 'DotGothic16',var(--num),monospace;color:#ffe14a;white-space:nowrap}
+.dbub{position:absolute;background:#fff;color:#1a1423;font:700 clamp(10px,2.4vw,15px)/1.2 'DotGothic16',var(--num),monospace;padding:2px 8px;border:2px solid #1a1423;pointer-events:none;white-space:nowrap}
+.dgain{position:absolute;left:50%;top:30%;transform:translateX(-50%);font:700 clamp(16px,4.2vw,30px)/1 'DotGothic16',var(--num),monospace;color:#ffe14a;text-shadow:2px 2px 0 #1a1423;pointer-events:none;white-space:nowrap}
+.dgain.go{animation:dgrise 2.4s steps(12) forwards}
+@keyframes dgrise{0%{transform:translate(-50%,10px);opacity:0}10%{opacity:1}100%{transform:translate(-50%,-26px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.dgain.go{animation:none}}
+
 /* ---- mode / overtime / ledger ---- */
-body[data-mode="hero"] .tick-only{display:none}
-body[data-mode="ticker"] #dunCard{display:none}
+body:not([data-mode="ticker"]) .tick-only{display:none}
+body:not([data-mode="hero"]) #dunCard{display:none}
+body:not([data-mode="taxi"]):not([data-mode="delivery"]) #driveCard{display:none}
 .stage .fire{display:none}
 .stage[data-s="ot"] .fire{display:block}
 .stage .fire{position:absolute;left:-12px;bottom:-2px;width:72px;height:84px;opacity:.72;z-index:0;pointer-events:none}
@@ -316,7 +338,7 @@ input[type=date],input[type=month]{font:inherit;color:var(--ink);background:var(
     <section class="card sec">
       <h2>🎮 顯示方式</h2>
       <p class="sub">預設係勇者打地下城(唔顯示大跳字金額)。想直接睇錢跳,就轉做跳字計錢。</p>
-      <div class="set"><div class="f full"><label for="mode">主頁顯示</label><select id="mode"><option value="hero">⚔️ 勇者打地下城(預設)</option><option value="ticker">🔢 跳字計錢</option></select></div></div>
+      <div class="set"><div class="f full"><label for="mode">主頁顯示</label><select id="mode"><option value="hero">⚔️ 勇者打地下城(預設)</option><option value="taxi">🚕 的士佬(第一人稱揸車)</option><option value="delivery">📦 送貨佬(第一人稱揸車)</option><option value="ticker">🔢 跳字計錢</option></select></div></div>
     </section>
 
     <section class="card sec">
@@ -373,6 +395,19 @@ input[type=date],input[type=month]{font:inherit;color:var(--ink);background:var(
         <div class="ground"></div>
       </div>
       <div class="dunsub amt" id="dunSub" aria-live="off"></div>
+    </section>
+
+    <section class="card dun" id="driveCard" aria-label="第一人稱駕駛" hidden>
+      <div class="dunhead"><h2 id="drvT">🚕 的士佬日常</h2><span class="amt" id="drvCnt"></span></div>
+      <div class="dview" id="dview" data-s="work">
+        <canvas id="dcv" width="240" height="128" aria-hidden="true"></canvas>
+        <div class="dhud tl" id="dTL"></div><div class="dhud tr" id="dTR"></div>
+        <div class="dbub" id="dBub" hidden></div>
+        <div class="dgain amt" id="dGain" hidden></div>
+        <div class="dmeter"><span id="dML">車費</span><b class="amt" id="dMV">¥0</b></div>
+        <div class="dtotal"><span>今日累計</span><b class="amt" id="dTV">¥0</b></div>
+      </div>
+      <div class="dunsub amt" id="drvSub" aria-live="off"></div>
     </section>
 
 
@@ -498,7 +533,7 @@ var DEF={done:false,snd:false,sndStep:100,vol:60,cur:'JPY',salary:240000,rate:10
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function fixCfg(c,j){
   if(!j||!j.mode)c.mode=(j&&j.dun===false)?'ticker':'hero';
-  if(c.mode!=='ticker')c.mode='hero';
+  if(['hero','taxi','delivery','ticker'].indexOf(c.mode)<0)c.mode='hero';
   delete c.dun;delete c.bounty;
   if(!c.ot||typeof c.ot!=='object')c.ot={since:null,log:{}};
   if(!c.ot.log||typeof c.ot.log!=='object')c.ot.log={};
@@ -649,6 +684,7 @@ function render(){
     if(ip!==lastInt&&lastInt>=0&&(st.st==='work'||st.st==='ot')){T.classList.remove('bump');void T.offsetWidth;T.classList.add('bump');}
     lastInt=ip;
     dungeon(st);
+    drive(st);
     $('#stChip').textContent=st.chip;$('#stMsg').textContent=st.msg;
     syncOT(st);
     $('#perSecTxt').innerHTML=(st.st==='work'||(st.st==='ot'&&cfg.otPay))?'每秒 <b>+'+yen(st.perSec,C().ps)+'</b> 入緊袋':'冇錢袋MOMENT';
@@ -837,6 +873,377 @@ function dungeon(st){
   $('#dunSub').textContent=sub;
 }
 
+/* ---------- driving modes: taxi / delivery (first-person, pixel pseudo-3D) ---------- */
+var DV={inited:false,raf:0,last:0,pos:0,tw:0,yaw:0,curve:0,st:null,t0:0,ti:-1,key:'',sigId:-1,sigZ:0,popUntil:0,subTxt:'',bubTxt:'',ped:null,fps:0};
+var DW=240,DH=128,DHY=44,DZ0=0.9,DV0=9;
+function mulb(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hstr(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function hz(n){n=Math.imul((n|0)^(n>>>16),2246822507);n=Math.imul(n^(n>>>13),3266489909);return(((n^(n>>>16))>>>0)/4294967296);}
+function sm(x){x=x<0?0:x>1?1:x;return x*x*(3-2*x);}
+function cl(x,a,b){return x<a?a:x>b?b:x;}
+function mkCV(g,p){
+  var h=g.length,w=g[0].length,c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');
+  for(var yy=0;yy<h;yy++)for(var xx=0;xx<w;xx++){var ch=g[yy].charAt(xx);if(ch!=='.'&&p[ch])x.fillStyle=p[ch],x.fillRect(xx,yy,1,1);}
+  return c;
+}
+var PERSON_G=["..KKKK..",".KHHHHK.","KHSSSSHK",".KSESEK.",".KSSSSK.","..KKKK..",".KCCCCK.","KCCCCCCK","KSCCCCSK","KSCCCCSK",".KCCCCK.",".KBBBBK.",".KBKKBK.",".KBK.KBK",".KBK.KBK",".KKK.KKK"];
+var PARCEL_G=["KKKKKKKKKKKK","KBBBBTTBBBBK","KBBBBTTBBBBK","KBBBBTTBBBBK","KBBBBTTBBBBK","KbbbbTTbbbbK","KbbbbTTbbbbK","KbbbbbbbbbbK","KKKKKKKKKKKK"];
+var DSC={};
+function dsp(k,a,b){
+  var key=k+(a||'')+(b||'');if(DSC[key])return DSC[key];
+  var c;
+  if(k==='person')c=mkCV(PERSON_G,{K:'#1a1423',S:'#f5c9a0',E:'#1a1423',H:b,C:a,B:'#2f4a9a'});
+  else if(k==='parcel')c=mkCV(PARCEL_G,{K:'#1a1423',B:'#c9954f',b:'#a6753a',T:'#f2e6c8'});
+  else if(k==='phead')c=mkCV(PERSON_G.slice(0,6),{K:'#1a1423',S:'#f5c9a0',E:'#1a1423',H:b});
+  else c=mkCV(SPR[k].g,SPR[k].p);
+  return(DSC[key]=c);
+}
+function skyCV(night,layer){
+  var c=document.createElement('canvas');c.width=360;c.height=46;var x=c.getContext('2d');
+  var r=mulb(night?77:91);
+  var cols=night?(layer?['#0f1738','#141c44','#10142f']:['#0a1028','#0c1230']):(layer?['#8fa5cf','#9fb2d8','#86a0c8']:['#aec0e0','#b8c8e6']);
+  var xx=-4;
+  while(xx<364){
+    var w=8+Math.floor(r()*(layer?14:18)),h=(layer?12:8)+Math.floor(r()*(layer?30:22));
+    var col=cols[Math.floor(r()*cols.length)];
+    x.fillStyle=col;x.fillRect(xx,46-h,w,h);
+    if(layer){
+      for(var wy=46-h+3;wy<42;wy+=4)for(var wx=xx+2;wx<xx+w-2;wx+=4){
+        if(night){if(r()<.28){x.fillStyle=r()<.8?'#ffd86b':'#7fe8ff';x.fillRect(wx,wy,2,2);}}
+        else if(r()<.55){x.fillStyle='rgba(255,255,255,.35)';x.fillRect(wx,wy,2,2);}
+      }
+    }
+    if(r()<.12){x.fillStyle=col;x.fillRect(xx+Math.floor(w/2),46-h-6,1,6);}
+    xx+=w+(r()<.3?2:0);
+  }
+  if(layer){ /* a little tower, Tokyo style */
+    var tx=250,tb=46;
+    x.fillStyle=night?'#ff5a4a':'#e0453a';
+    for(var i=0;i<30;i++){var ww=Math.max(1,Math.round(7*(1-i/30)));x.fillStyle=(i%6<3)?(night?'#ff6a4a':'#e0453a'):(night?'#ffe9c8':'#ffffff');x.fillRect(tx-Math.floor(ww/2),tb-i-1,ww,1);}
+    x.fillRect(tx,tb-36,1,6);
+  }
+  return c;
+}
+var DPAL={
+  day:{sky:['#4f9fee','#62adf2','#76baf5','#8cc7f8','#a3d3fa','#bbdffb','#d2ebfc'],g1:'#5aa04e',g2:'#4e9244',r1:'#474c5c',r2:'#4e5364',w:'#9aa0ae',e1:'#d94b3c',e2:'#f0f0f0',ln:'#f4f4ea',far:'#aec0e0'},
+  night:{sky:['#04061a','#070b26','#0b1233','#101940','#162250','#1d2c62','#27387a'],g1:'#16301f',g2:'#112719',r1:'#1b1d28',r2:'#202330',w:'#2c3045',e1:'#8a2a2a',e2:'#b9bcc8',ln:'#d8cf8a',far:'#0a1028'}
+};
+var DS_PAL={day:{b:['#eadbc5','#cbd8e8','#dcb9a8','#bccba9','#e6c48c','#d5cbe6'],w:'#7aa6d4',roof:'#b85c4a'},night:{b:['#262d52','#2c3158','#34294d','#21394a','#2a2540','#303a5c'],w:'#ffd86b',roof:'#1a1f3a'}};
+
+var TR={key:'',list:[],cum:[0],rng:null};
+var DDEST=['機場','東京車站','酒店','醫院','商場','大學','公司','夜店街','演唱會場','溫泉旅館','球場','港口','水族館','新宿','銀座'];
+var DITEM=[['外賣','田中樣'],['包裹','佐藤樣'],['生鮮','鈴木樣'],['花束','高橋樣'],['文件','伊藤樣'],['蛋糕','渡邊樣'],['藥品','山本樣'],['零食','中村樣'],['咖啡','小林樣'],['壽司','加藤樣']];
+function genTrip(r){
+  var D=Math.round(300+Math.pow(r(),1.3)*1500),turns=[],reds=[],t=20,tn=Math.max(2,Math.round(D/95));
+  while(true){t+=12+r()*(D/tn*1.2);if(t>D-34)break;var dur=6+r()*3;turns.push({t:t,d:dur,dir:r()<.5?-1:1});t+=dur;}
+  var rc=Math.floor(D/360+r()*.8);
+  for(var i=0;i<rc;i++){
+    for(var tr=0;tr<12;tr++){
+      var rt=30+r()*(D-80),ok=rt>22&&rt<D-26;
+      turns.forEach(function(x){if(rt>x.t-8&&rt<x.t+x.d+8)ok=false;});
+      reds.forEach(function(x){if(Math.abs(rt-x.t)<28)ok=false;});
+      if(ok){reds.push({t:rt,d:7+r()*6,id:0});break;}
+    }
+  }
+  reds.sort(function(a,b){return a.t-b.t;});
+  return {D:D,turns:turns,reds:reds,shirt:['#e0453a','#3a6fe0','#4ed36a','#ffd23a','#c86bd6','#ff8a3a'][Math.floor(r()*6)],hair:['#1a1423','#5e3b1a','#c9a878','#8a8a8a'][Math.floor(r()*4)],dest:Math.floor(r()*99),car:['#e0453a','#3a6fe0','#f2f2f2','#ffd23a','#4ed36a'][Math.floor(r()*5)]};
+}
+function tripsUpTo(E){
+  var key=ymd(new Date())+cfg.mode;
+  if(TR.key!==key){TR.key=key;TR.list=[];TR.cum=[0];TR.rng=mulb(hstr(key));}
+  var n=0;
+  while(TR.cum[TR.cum.length-1]<=E+1&&n++<400){var T=genTrip(TR.rng);T.i=TR.list.length;TR.list.push(T);TR.cum.push(TR.cum[TR.cum.length-1]+T.D);}
+}
+function tripSpeed(T,u){
+  var f=sm((u-12)/4)*sm((T.D-12-u)/4);
+  for(var i=0;i<T.reds.length;i++){var rd=T.reds[i];f*=u<rd.t?sm((rd.t-u)/4):(u<=rd.t+rd.d?0:sm((u-rd.t-rd.d)/4));}
+  return f;
+}
+function tripCurve(T,u){
+  var c=0;
+  for(var i=0;i<T.turns.length;i++){var tn=T.turns[i];if(u>=tn.t&&u<=tn.t+tn.d){var s=Math.sin(Math.PI*(u-tn.t)/tn.d);c+=tn.dir*s*s;}}
+  return c;
+}
+function streetId(T,u){var n=0;for(var i=0;i<T.turns.length;i++)if(u>T.turns[i].t+T.turns[i].d/2)n++;return T.i*31+n;}
+
+/* projection helpers */
+function w2s(zr,lat){var p=DZ0/zr,hw=150*p,q=1-p,sh=DV.curve*q*q*110;return {p:p,hw:hw,x:DW/2+sh+hw*(.5+lat),y:DHY+(DH-DHY)*p};}
+function dFill(cx,c,x,y,w,h){cx.fillStyle=c;cx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
+function drawBuilding(cx,s,side,seed,night){
+  var r=hz(seed),r2=hz(seed+7),r3=hz(seed+13);
+  var D=DS_PAL[night?'night':'day'],hw=s.hw,bw=hw*(.9+r2*.7),bh=hw*(.9+r*1.5);
+  var x0=side<0?s.x-bw:s.x;
+  var col=D.b[Math.floor(r3*D.b.length)],y0=s.y-bh;
+  dFill(cx,col,x0,y0,bw,bh);
+  dFill(cx,D.roof,x0-1,y0-Math.max(1,hw*.06),bw+2,Math.max(1,hw*.06));
+  var ws=Math.max(2,hw*.13),gap=ws*1.9;
+  for(var wy=y0+gap*.5;wy<s.y-gap*.7;wy+=gap)for(var wx=x0+gap*.45;wx<x0+bw-ws;wx+=gap){
+    if(night){if(hz(seed*3+Math.round(wx*.3)+Math.round(wy*.7))<.45)dFill(cx,D.w,wx,wy,ws,ws);}
+    else dFill(cx,D.w,wx,wy,ws,ws*.8);
+  }
+  if(r>.6){var sc=['#ff4aa8','#4ae0ff','#ffe14a','#7dff9b'][Math.floor(r2*4)];dFill(cx,sc,x0+bw*.15,s.y-hw*.42,bw*.7,Math.max(2,hw*.1));}
+}
+function drawTree(cx,s,side){
+  var im=dsp('pine'),tw=Math.max(4,s.hw*.55),th=tw*im.height/im.width;
+  cx.drawImage(im,Math.round(s.x-tw/2),Math.round(s.y-th),Math.round(tw),Math.round(th));
+}
+function drawLamp(cx,s,side,night){
+  var h=s.hw*.9;dFill(cx,night?'#4a4f6a':'#555b6e',s.x,s.y-h,Math.max(1,s.hw*.03),h);
+  dFill(cx,night?'#ffe9a0':'#d0d4e0',s.x-(side<0?-1:s.hw*.12),s.y-h,Math.max(2,s.hw*.14),Math.max(1,s.hw*.04));
+  if(night){cx.fillStyle='rgba(255,230,140,.18)';cx.fillRect(Math.round(s.x-s.hw*.22),Math.round(s.y-h),Math.round(s.hw*.5),Math.round(s.hw*.18));}
+}
+function drawCarFront(cx,s,col,night){
+  var w=Math.max(4,s.hw*.55),h=w*.5,x=s.x-w/2,y=s.y-h;
+  dFill(cx,col,x,y+h*.32,w,h*.55);dFill(cx,col,x+w*.14,y,w*.72,h*.42);
+  dFill(cx,'#9fd0ff',x+w*.2,y+h*.06,w*.6,h*.3);
+  dFill(cx,'#1a1423',x,y+h*.85,w,Math.max(1,h*.15));
+  var lc=night?'#fff6c0':'#ffffff';dFill(cx,lc,x+w*.06,y+h*.5,w*.2,h*.16);dFill(cx,lc,x+w*.74,y+h*.5,w*.2,h*.16);
+  if(night){cx.fillStyle='rgba(255,240,170,.22)';cx.fillRect(Math.round(x-w*.2),Math.round(y+h*.35),Math.round(w*1.4),Math.round(h*.5));}
+}
+function drawCarSide(cx,x,y,w,col){
+  var h=w*.4;dFill(cx,col,x,y-h*.7,w,h*.5);dFill(cx,col,x+w*.22,y-h*1.2,w*.5,h*.55);dFill(cx,'#9fd0ff',x+w*.27,y-h*1.12,w*.4,h*.38);
+  dFill(cx,'#1a1423',x+w*.12,y-h*.25,w*.2,h*.3);dFill(cx,'#1a1423',x+w*.66,y-h*.25,w*.2,h*.3);
+}
+function drawSignal(cx,s,col){
+  var h=s.hw*1.0,x=s.x;
+  dFill(cx,'#3a3f55',x,s.y-h,Math.max(1,s.hw*.04),h);
+  var bw=Math.max(5,s.hw*.2),bh=bw*2.4;
+  dFill(cx,'#1a1423',x-bw/2,s.y-h-bh*.85,bw,bh);
+  var cc={r:'#ff3b3b',y:'#ffd23a',g:'#3bff7a'};
+  ['r','y','g'].forEach(function(k,i){dFill(cx,col===k?cc[k]:'#2a2f40',x-bw*.3,s.y-h-bh*.85+bh*(.08+i*.3),bw*.6,bh*.22);});
+}
+
+function pushScn(L,k,zr2,side,sid,night){
+  var cx=DV.cx,h=hz(k*13+(side<0?3:9)+sid*101),kind=h<.58?0:h<.8?1:h<.9?2:3;
+  if(kind===3)return;
+  L.push({z:zr2,f:function(){
+    var s=w2s(zr2,side*(kind===0?1.2:kind===1?1.45:1.1));
+    if(s.y>DH+4)return;
+    if(kind===0)drawBuilding(cx,s,side,k*7+(side<0?1:2)+sid*53,night);
+    else if(kind===1)drawTree(cx,s,side);
+    else drawLamp(cx,s,side,night);
+  }});
+}
+function drivePalette(S){return S.night?DPAL.night:DPAL.day;}
+function drawDrive(S){
+  var cx=DV.cx,W=DW,H=DH,hy=DHY,P=drivePalette(S),night=S.night,tw=DV.tw;
+  cx.imageSmoothingEnabled=false;
+  /* sky */
+  for(var y=0;y<hy;y++){cx.fillStyle=P.sky[Math.min(6,Math.floor(y/hy*7))];cx.fillRect(0,y,W,1);}
+  if(night){
+    for(var i=0;i<34;i++){var sx=((hz(i*5+1)*360-DV.yaw*14)%360+360)%360;if(sx<W){var sy=hz(i*5+2)*(hy-8),tw2=(Math.floor(tw*2+i)%5)?'#ffffff':'#7a86c8';dFill(cx,tw2,sx,sy,1,1);}}
+    var mx=((190-DV.yaw*38)%420+420)%420-60;if(mx>-12&&mx<W+4)cx.drawImage(dsp('moon'),Math.round(mx),8,16,16);
+  }else{
+    var sx2=((176-DV.yaw*38)%420+420)%420-60;if(sx2>-16&&sx2<W+4)cx.drawImage(dsp('sun'),Math.round(sx2),5,26,26);
+    for(var c=0;c<3;c++){var cxx=((hz(c+40)*420-DV.yaw*26+tw*(2+c))%420+420)%420-60;if(cxx>-40&&cxx<W+4){var cim=dsp('cloud');cx.drawImage(cim,Math.round(cxx),4+c*7,cim.width*2,cim.height*2);}}
+  }
+  var sk0=night?DV.sk[0][1]:DV.sk[0][0],sk1=night?DV.sk[1][1]:DV.sk[1][0];
+  [[sk0,.5],[sk1,1]].forEach(function(a){var o=(((-DV.yaw*70*a[1])%360)+360)%360;cx.drawImage(a[0],Math.round(o-360),hy-45);cx.drawImage(a[0],Math.round(o),hy-45);});
+  /* ground + road, scanline by scanline */
+  var pos=DV.pos;
+  for(var y2=hy;y2<H;y2++){
+    var p=(y2-hy+.5)/(H-hy),zr=DZ0/p,q=1-p,sh=DV.curve*q*q*110,hw=150*p+1,c0=W/2+sh+hw*.5;
+    var wz=pos+zr,band=Math.floor(wz/2.2)&1;
+    cx.fillStyle=band?P.g1:P.g2;cx.fillRect(0,y2,W,1);
+    var wk=Math.max(1,hw*.2);
+    cx.fillStyle=P.w;cx.fillRect(Math.round(c0-hw-wk),y2,Math.round(wk),1);cx.fillRect(Math.round(c0+hw),y2,Math.round(wk),1);
+    cx.fillStyle=band?P.r1:P.r2;cx.fillRect(Math.round(c0-hw),y2,Math.round(hw*2),1);
+    var ew=Math.max(1,hw*.06),eband=Math.floor(wz/1.1)&1;
+    cx.fillStyle=eband?P.e1:P.e2;cx.fillRect(Math.round(c0-hw),y2,Math.round(ew),1);cx.fillRect(Math.round(c0+hw-ew),y2,Math.round(ew),1);
+    if((Math.floor(wz/1.7)&1)===0){var lw=Math.max(1,hw*.028);cx.fillStyle=P.ln;cx.fillRect(Math.round(c0-lw/2),y2,Math.round(lw),1);}
+  }
+  /* depth-sorted things */
+  var L=[],gap=3.2,k0=Math.floor((pos+1.3)/gap),k1=Math.floor((pos+40)/gap);
+  var sid=S.sid;
+  for(var k=k0;k<=k1;k++){
+    var zr2=k*gap-pos;if(zr2<1.3)continue;
+    pushScn(L,k,zr2,-1,sid,night);pushScn(L,k,zr2,1,sid,night);
+  }
+  /* oncoming traffic (right lane, we drive on the left) */
+  for(var oi=0;oi<3;oi++){
+    var per=46,rel=((hz(oi+S.dayN*3)*per-(pos+tw*5.5))%per+per)%per+1.3;
+    if(rel<38)(function(rel,oi){L.push({z:rel,f:function(){var s=w2s(rel,1);if(s.y<H)drawCarFront(cx,s,['#e0453a','#3a6fe0','#f2f2f2','#ffd23a','#4ed36a'][(oi+S.dayN)%5],night);}});})(rel,oi);
+  }
+  /* traffic light */
+  if(S.sig){var sg=S.sig;L.push({z:sg.zr,f:function(){var s=w2s(sg.zr,-1.12);drawSignal(cx,s,sg.col);}});
+    if(sg.cross!=null){L.push({z:7,f:function(){var s=w2s(7,0),w=s.hw*.6,xx=sg.cross*(W+w);drawCarSide(cx,W-xx,s.y,w,S.crossCol);}});}}
+  /* people at stops */
+  if(S.ped){var pd=S.ped;L.push({z:pd.zr,f:function(){
+    var s=w2s(pd.zr,pd.lat),im=dsp('person',pd.shirt,pd.hair),ph=Math.max(8,s.hw*.55),pw=ph*im.width/im.height;
+    var x=Math.round(s.x-pw/2),y=Math.round(s.y-ph);
+    cx.drawImage(im,x,y,Math.round(pw),Math.round(ph));
+    DV.pedPos={x:s.x/W,y:(y)/H};
+    if(pd.parcel){var pc=dsp('parcel'),pcw=Math.max(5,ph*.5);cx.drawImage(pc,Math.round(s.x-pcw/2),Math.round(y+ph*.38),Math.round(pcw),Math.round(pcw*.75));pd.px=s.x;pd.py=y+ph*.45;}
+    else {pd.px=s.x;pd.py=y+ph*.45;}
+  }});}
+  L.sort(function(a,b){return b.z-a.z;});
+  L.forEach(function(o){o.f();});
+  /* parcel in flight between seat and hands */
+  if(S.flyP&&S.ped){var fp=S.flyP,pc2=dsp('parcel'),fw=Math.round(10-fp.t*4),sx0=W-47,sy0=96,ex=S.ped.px||60,ey=S.ped.py||70;
+    var fx=sx0+(ex-sx0)*fp.t,fy=sy0+(ey-sy0)*fp.t-Math.sin(fp.t*Math.PI)*10;if(fp.rev){fx=ex+(sx0-ex)*fp.t;fy=ey+(sy0-ey)*fp.t-Math.sin(fp.t*Math.PI)*10;}
+    cx.drawImage(pc2,Math.round(fx-fw/2),Math.round(fy-fw*.4),fw,Math.round(fw*.75));}
+  /* headlight wash at night */
+  if(night){
+    var g=cx.createRadialGradient(W/2,H-20,6,W/2,H-20,92);g.addColorStop(0,'rgba(255,240,170,.34)');g.addColorStop(1,'rgba(255,240,170,0)');
+    cx.globalCompositeOperation='lighter';cx.fillStyle=g;cx.fillRect(0,hy,W,H-hy);cx.globalCompositeOperation='source-over';
+  }
+  drawDash(S);
+}
+function drawDash(S){
+  var cx=DV.cx,W=DW,H=DH;
+  /* roof band + A pillars */
+  dFill(cx,'#0b0e18',0,0,W,5);dFill(cx,'#161a2a',0,5,W,1);
+  cx.fillStyle='#0b0e18';
+  for(var i=0;i<46;i++){var w=Math.round(14-i*.22);if(w>0)cx.fillRect(0,i+5,w,1);}
+  for(var j=0;j<46;j++){var w2=Math.round(14-j*.22);if(w2>0)cx.fillRect(W-w2,j+5,w2,1);}
+  /* mirror */
+  dFill(cx,'#0b0e18',W/2-24,5,48,13);dFill(cx,'#242b45',W/2-22,6,44,10);dFill(cx,'#3c4670',W/2-22,6,44,1);
+  dFill(cx,S.night?'#10163a':'#6fa0d8',W/2-21,7,42,8);
+  if(S.rear){var hd=dsp('phead',S.rear.shirt,S.rear.hair);cx.drawImage(hd,Math.round(W/2-5+Math.sin(DV.tw*1.7)*1.2),8,10,8);}
+  /* dash */
+  dFill(cx,'#0e111d',0,100,W,28);dFill(cx,'#262d4a',0,100,W,2);dFill(cx,'#161b30',0,102,W,2);
+  /* indicators */
+  var blink=Math.floor(DV.tw*2.5)%2===0;
+  if(S.turnDir&&blink){cx.fillStyle='#3bff7a';var ax=S.turnDir<0?92:136;if(S.turnDir<0){for(var a=0;a<5;a++)cx.fillRect(ax+a,106+a-0,1,1),cx.fillRect(ax+a,106-a+8,1,1);}else{for(var b=0;b<5;b++)cx.fillRect(ax+5-b,106+b,1,1),cx.fillRect(ax+5-b,106-b+8,1,1);}}
+  if(S.hazard&&blink){dFill(cx,'#ffb02e',18,18,10,3);dFill(cx,'#ffb02e',W-28,18,10,3);dFill(cx,'#ffb02e',110,106,6,6);dFill(cx,'#ffb02e',124,106,6,6);}
+  /* speed LED bar */
+  var n=Math.round(S.vf*14);
+  for(var s=0;s<14;s++){dFill(cx,s<n?(s<9?'#7dff9b':s<12?'#ffe14a':'#ff5a4a'):'#1c2238',80+s*5,114,4,4);}
+  /* steering wheel */
+  var cxw=W/2,cyw=150,R=44,ang=S.steer*.85;
+  for(var t=0;t<120;t++){
+    var th=t/120*Math.PI*2,rx=cxw+Math.cos(th)*R,ry=cyw+Math.sin(th)*R*.9;
+    if(ry<99||ry>H)continue;
+    cx.fillStyle='#181c2e';cx.fillRect(Math.round(rx)-3,Math.round(ry)-2,6,5);
+    cx.fillStyle='#2a3152';cx.fillRect(Math.round(rx)-2,Math.round(ry)-2,3,2);
+  }
+  var mt=-Math.PI/2+ang,mx=cxw+Math.cos(mt)*R,my=cyw+Math.sin(mt)*R*.9;
+  if(my>99)dFill(cx,S.ot?'#ff6a3a':'#ff3b3b',mx-3,my-2,7,4);
+  /* parcel on the seat */
+  if(S.seatParcel){var pc=dsp('parcel');cx.drawImage(pc,W-58,86,22,16);}
+  if(S.ot){cx.fillStyle='rgba(255,90,30,.10)';cx.fillRect(0,0,W,H);}
+}
+var DMODE=['taxi','delivery'];
+function driveInit(){
+  if(DV.inited)return;DV.inited=true;
+  if(!dInit)initDun();
+  DV.cv=$('#dcv');DV.cx=DV.cv.getContext('2d');
+  DV.sk=[[skyCV(false,0),skyCV(true,0)],[skyCV(false,1),skyCV(true,1)]];
+}
+function driveStateInfo(st){
+  var hh=new Date().getHours(),n=(hh>=6&&hh<17);
+  var night=st.st==='lunch'?false:st.st==='post'?true:st.st==='pre'?false:!n;
+  return night;
+}
+function driveCompute(){
+  var st=DV.st;if(!st)return null;
+  var moving=(st.st==='work'||st.st==='ot');
+  var tod=st.today+(moving?st.perSec*Math.max(0,(performance.now()-DV.t0)/1000):0);
+  var pm=st.perMin>0?st.perMin:0;
+  var E=pm>0?tod/pm*60:0;
+  tripsUpTo(E);
+  var i=Math.min(TR.list.length-1,Math.max(0,DV.ti>=0&&DV.ti<TR.list.length&&TR.cum[DV.ti]<=E?DV.ti:0));
+  while(i<TR.list.length-1&&TR.cum[i+1]<=E)i++;
+  var T=TR.list[i],u=E-TR.cum[i],fare=pm>0?(E-TR.cum[i])/60*pm:0;
+  return {st:st,moving:moving,tod:tod,pm:pm,E:E,i:i,T:T,u:u,fare:fare,prevFare:(i>0&&pm>0)?TR.list[i-1].D/60*pm:0};
+}
+function driveFrame(ts){
+  DV.raf=requestAnimationFrame(driveFrame);
+  if(document.hidden||$('#viewHome').hidden||(cfg.mode!=='taxi'&&cfg.mode!=='delivery')){return;}
+  if(ts-DV.last<30)return;
+  var dt=Math.min(.1,(ts-DV.last)/1000);DV.last=ts;
+  var C0=driveCompute();if(!C0)return;
+  driveInit();
+  var T=C0.T,u=C0.u,del=cfg.mode==='delivery';
+  var vf=C0.moving?tripSpeed(T,u):0;
+  var ctarget=C0.moving?tripCurve(T,u):0;
+  DV.curve+=(ctarget-DV.curve)*Math.min(1,dt*7);
+  var v=vf*(1-.35*Math.min(1,Math.abs(DV.curve)));
+  DV.pos+=DV0*v*dt;DV.tw+=dt;DV.yaw+=DV.curve*v*dt*.55;
+  /* traffic light state */
+  var sig=null,hazard=!C0.moving,reds=T.reds;
+  for(var ri=0;ri<reds.length;ri++){var rd=reds[ri];
+    if(u>rd.t-4&&u<rd.t+rd.d+6){
+      var id=T.i*100+ri;
+      if(DV.sigId!==id){DV.sigId=id;DV.sigZ=DV.pos+(u<rd.t?21.6:3.2);}
+      var zr=DV.sigZ-DV.pos;
+      if(zr>1.2&&zr<40){var col=u<rd.t?'y':(u<=rd.t+rd.d?'r':'g');sig={zr:zr,col:col,cross:(u>rd.t+1.2&&u<rd.t+rd.d-1.2)?((u-rd.t-1.2)/(rd.d-2.4)):null};}
+    }
+  }
+  /* people at the kerb */
+  var ped=null,flyP=null,seatParcel=false,rear=null,bub='',D=T.D;
+  function P3(zr,lat,par){return {zr:zr,lat:lat,shirt:T.shirt,hair:T.hair,parcel:!!par};}
+  if(u>=8&&u<=D-11){if(del)seatParcel=true;else rear={shirt:T.shirt,hair:T.hair};}
+  if(C0.moving){
+    if(u<12){
+      /* pick-up: a person walks up to the car (taxi: boards; delivery: hands the parcel over) */
+      if(u<7){var s0=sm(u/6);ped=P3(7-5.75*s0,-1.55+.5*s0,del&&u<5);if(u<2.5)bub=del?'荷物です!':'的士!';}
+      else if(del){var w0=sm((u-7)/5);ped=P3(1.25+5.5*w0,-1.05-.5*w0,false);}
+      if(del&&u>=5&&u<8)flyP={t:sm((u-5)/3),rev:true};
+      if(del&&u>=8)seatParcel=true;
+    }else if(u>D-11){
+      var q=(u-(D-11))/11;
+      if(del){
+        seatParcel=q<.45;
+        if(q<.4)ped=P3(7-5.75*sm(q/.4),-1.5+.45*sm(q/.4),false);
+        else if(q<.7){ped=P3(1.25,-1.05,false);flyP={t:sm((q-.4)/.3)};}
+        else{var w1=sm((q-.7)/.3);ped=P3(1.25+5.5*w1,-1.05-.5*w1,true);bub='ありがとう!';}
+      }else{
+        var w3=sm(cl((q-.1)/.8,0,1));ped=P3(1.25+5.75*w3,-1.05-.55*w3,false);if(q>.35)bub='多謝!';
+      }
+    }
+  }
+  var night=driveStateInfo(C0.st);
+  var S={night:night,vf:vf,steer:DV.curve,turnDir:0,hazard:hazard,sig:sig,ped:ped,flyP:flyP,seatParcel:seatParcel,rear:rear,ot:C0.st.st==='ot',sid:streetId(T,u),dayN:Math.floor(hstr(TR.key)%997),crossCol:T.car};
+  for(var ti=0;ti<T.turns.length;ti++){var tn=T.turns[ti];if(u>tn.t-3&&u<tn.t+tn.d){S.turnDir=tn.dir;}}
+  DV.pedPos=null;
+  drawDrive(S);
+  /* HUD */
+  var changed=DV.ti!==C0.i;
+  if(changed){
+    if(DV.ti>=0&&C0.i>DV.ti&&C0.i-DV.ti===1&&C0.prevFare>0&&C0.moving){var g=$('#dGain');g.textContent='+'+yen(C0.prevFare,C().d)+' 💰';g.hidden=false;g.classList.remove('go');void g.offsetWidth;g.classList.add('go');clearTimeout(DV.gT);DV.gT=setTimeout(function(){g.hidden=true;},2600);}
+    DV.ti=C0.i;
+  }
+  var bb=$('#dBub');
+  if(bub&&DV.pedPos){if(bb.textContent!==bub)bb.textContent=bub;bb.hidden=false;bb.style.left=Math.min(78,Math.max(2,DV.pedPos.x*100-4))+'%';bb.style.top=Math.max(4,DV.pedPos.y*100-14)+'%';}else bb.hidden=true;
+  var mv=yen(C0.fare,C().d);if($('#dMV').dataset.v!==mv){$('#dMV').textContent=mv;$('#dMV').dataset.v=mv;}
+  var tv=yen(C0.tod,C().d);if($('#dTV').dataset.v!==tv){$('#dTV').textContent=tv;$('#dTV').dataset.v=tv;}
+  var left=Math.max(0,T.D-u);
+  $('#dTR').textContent=C0.moving?'到站 '+pad(Math.floor(left/60))+':'+pad(Math.floor(left%60)):'';
+  $('#dview').setAttribute('data-s',C0.st.st);
+}
+function drive(st){
+  var on=(cfg.mode==='taxi'||cfg.mode==='delivery'),card=$('#driveCard');
+  card.hidden=!on;
+  if(!on){DV.ti=-1;if(DV.raf){cancelAnimationFrame(DV.raf);DV.raf=0;}return;}
+  DV.st=st;DV.t0=performance.now();
+  if(!DV.raf)DV.raf=requestAnimationFrame(driveFrame);
+  var del=cfg.mode==='delivery',C0=driveCompute();if(!C0)return;
+  var T=C0.T,u=C0.u,fare=C0.fare;
+  $('#dview').classList.toggle('del',del);
+  $('#drvT').textContent=del?'📦 送貨佬日常':'🚕 的士佬日常';
+  $('#dML').textContent=del?'運費':'車費';
+  $('#drvCnt').innerHTML=del?'今日已送 <b>'+C0.i+'</b> 單':'今日已載 <b>'+C0.i+'</b> 位客';
+  var dst=del?DITEM[T.dest%DITEM.length]:null;
+  $('#dTL').textContent=del?'📦 '+dst[0]+' → '+dst[1]:'🚕 載客去 '+DDEST[T.dest%DDEST.length];
+  var sub;
+  var left=Math.max(0,T.D-u),mm=Math.floor(left/60);
+  var inStop=C0.moving&&(u<12||u>T.D-12);
+  var red=C0.moving&&T.reds.some(function(r){return u>=r.t&&u<=r.t+r.d;});
+  var turning=C0.moving&&T.turns.some(function(t){return u>t.t-3&&u<t.t+t.d;});
+  if(st.st==='ot')sub=cfg.otPay?'🔥 加班中…車錶照跳,收咗工都要再搵多單':'🔥 加班冇加班費…同自己拗緊頸';
+  else if(st.st==='lunch')sub='🍱 泊路邊食飯(午休唔計錢)';
+  else if(st.st==='pre')sub='🌅 未開工,車泊喺路邊,等開工先出車 ☕';
+  else if(st.st==='post')sub='🌙 收工喇,車泊好,今晚瞓得安樂 💤';
+  else if(st.st==='rest')sub='🏖️ 休假日,車放喺車房,唔使揸 💤';
+  else if(u<12)sub=del?'📦 上緊貨,執好先出發…':'🚕 客人上緊車,錶即刻跳…';
+  else if(u>T.D-12)sub=del?'📦 到埠喇,送貨上門,簽收!':'🚕 到埗喇,客人落車,多謝惠顧!';
+  else if(red)sub='🚦 紅燈,停一停(錶照跳)';
+  else if(turning)sub='↩️ 轉彎中,睇路睇路…';
+  else sub=(del?'📦 送緊貨,':'🚕 載緊客,')+'仲有 '+mm+' 分鐘到,'+(del?'運費':'車費')+'一路跳 ·  呢程 '+yen(fare,C().d);
+  if(sub!==DV.subTxt){DV.subTxt=sub;$('#drvSub').textContent=sub;}
+}
+
 /* ---------- coin sound ---------- */
 var AC=null,unlocked=false,lastMs=-1;
 function audioCtx(){
@@ -1018,7 +1425,7 @@ function readForm(){
   cfg.salary=n('#salary',DEF.salary,0,100000000);cfg.rate=n('#rate',100,1,100);cfg.payday=Math.round(n('#payday',25,1,31));
   cfg.start=$('#start').value||DEF.start;cfg.end=$('#end').value||DEF.end;cfg.ls=$('#ls').value||DEF.ls;cfg.le=$('#le').value||DEF.le;
   cfg.jp=$('#jp').checked;cfg.early=$('#early').checked;
-  cfg.snd=$('#snd').checked;cfg.sndStep=n('#sndStep',SND[cfg.cur]||100,0.01,1e9);cfg.vol=n('#vol',60,0,100);cfg.mode=$('#mode').value==='ticker'?'ticker':'hero';cfg.otPay=$('#otPay').checked;cfg.otRate=n('#otRate',OTR[cfg.cur]||2000,0,1e9);$('#otRate').disabled=!cfg.otPay;dK=-1;lastMs=-1;syncSndBtn();updateSndNote();
+  cfg.snd=$('#snd').checked;cfg.sndStep=n('#sndStep',SND[cfg.cur]||100,0.01,1e9);cfg.vol=n('#vol',60,0,100);cfg.mode=['hero','taxi','delivery','ticker'].indexOf($('#mode').value)>=0?$('#mode').value:'hero';cfg.otPay=$('#otPay').checked;cfg.otRate=n('#otRate',OTR[cfg.cur]||2000,0,1e9);$('#otRate').disabled=!cfg.otPay;dK=-1;lastMs=-1;syncSndBtn();updateSndNote();
   cfg.days=$$('input',daysBox).filter(function(c){return c.checked;}).map(function(c){return +c.value;});
   var w=[];
   if(toSec(cfg.end)<=toSec(cfg.start))w.push('放工時間要遲過上班時間,暫時用返預設 9:00–18:00 計。');
@@ -1075,5 +1482,4 @@ showView(cfg.done?'home':'setup');
 setInterval(render,100);
 })();
 </script>
-
 </body></html>
